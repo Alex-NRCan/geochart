@@ -27418,7 +27418,7 @@ var ChartValidator = /*#__PURE__*/function () {
         valid: valid,
         errors: (_validate$errors = validate.errors) === null || _validate$errors === void 0 ? void 0 : _validate$errors.map(function (e) {
           var m = e.message || 'generic schema error';
-          return "".concat(e.dataPath, " | ").concat(e.keyword, " | ").concat(m);
+          return "".concat(e.schemaPath, " | ").concat(e.keyword, " | ").concat(m);
         })
       };
     });
@@ -27437,7 +27437,7 @@ var ChartValidator = /*#__PURE__*/function () {
         valid: valid,
         errors: (_validate$errors2 = validate.errors) === null || _validate$errors2 === void 0 ? void 0 : _validate$errors2.map(function (e) {
           var m = e.message || 'generic schema error';
-          return "".concat(e.dataPath, " | ").concat(e.keyword, " | ").concat(m);
+          return "".concat(e.schemaPath, " | ").concat(e.keyword, " | ").concat(m);
         })
       };
     });
