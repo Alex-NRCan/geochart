@@ -7487,6 +7487,27 @@ function _defineProperty(obj, key, value) {
   }
   return obj;
 }
+;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/arrayWithoutHoles.js
+
+function _arrayWithoutHoles(arr) {
+  if (Array.isArray(arr)) return _arrayLikeToArray(arr);
+}
+;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/iterableToArray.js
+function _iterableToArray(iter) {
+  if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
+}
+;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/nonIterableSpread.js
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/toConsumableArray.js
+
+
+
+
+function _toConsumableArray(arr) {
+  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
+}
 ;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
 function extends_extends() {
   extends_extends = Object.assign ? Object.assign.bind() : function (target) {
@@ -9825,7 +9846,7 @@ tags.forEach(function (tagName) {
 
 ;// CONCATENATED MODULE: ./node_modules/@mui/styled-engine/index.js
 /**
- * @mui/styled-engine v5.14.13
+ * @mui/styled-engine v5.14.14
  *
  * @license MIT
  * This source code is licensed under the MIT license found in the
@@ -10113,9 +10134,6 @@ function getStyleValue(themeMapping, transform, propValueFinal, userValue = prop
     value = themeMapping[propValueFinal] || userValue;
   } else {
     value = getPath(themeMapping, propValueFinal) || userValue;
-  }
-  if (typeof value === 'object') {
-    if (false) {}
   }
   if (transform) {
     value = transform(value, userValue, themeMapping);
@@ -27425,6 +27443,7 @@ function ChartValidator() {
 ;// CONCATENATED MODULE: ./src/chart.tsx
 
 
+
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 /* eslint-disable no-console */
@@ -27461,6 +27480,9 @@ var sxClasses = {
  */
 function chart_Chart(props) {
   var _props$defaultColors, _props$defaultColors2, _props$defaultColors3, _props$defaultColors4, _props$defaultColors5, _props$defaultColors6;
+  // Prep ChartJS
+  Chart.register.apply(Chart, _toConsumableArray(registerables));
+
   // Fetch cgpv
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   var w = window;
@@ -27562,47 +27584,15 @@ function chart_Chart(props) {
    * @returns The Chart JSX.Element itself using Line as default
    */
   var renderChart = function renderChart() {
-    // Depending on the type of chart
-    switch (options.geochart.chart) {
-      case 'bar':
-        return /*#__PURE__*/(0,jsx_runtime.jsx)(dist_Chart, {
-          ref: chartRef,
-          type: "bar",
-          style: style,
-          data: data,
-          options: options,
-          redraw: redraw
-        });
-      case 'pie':
-        return /*#__PURE__*/(0,jsx_runtime.jsx)(dist_Chart, {
-          ref: chartRef,
-          type: "pie",
-          style: style,
-          data: data,
-          options: options,
-          redraw: redraw
-        });
-      case 'doughnut':
-        // Doughnut Chart
-        return /*#__PURE__*/(0,jsx_runtime.jsx)(dist_Chart, {
-          ref: chartRef,
-          type: "doughnut",
-          style: style,
-          data: data,
-          options: options,
-          redraw: redraw
-        });
-      default:
-        // Line Chart is default
-        return /*#__PURE__*/(0,jsx_runtime.jsx)(dist_Chart, {
-          ref: chartRef,
-          type: "line",
-          style: style,
-          data: data,
-          options: options,
-          redraw: redraw
-        });
-    }
+    // Create the Chart React
+    return /*#__PURE__*/(0,jsx_runtime.jsx)(dist_Chart, {
+      ref: chartRef,
+      type: options.geochart.chart,
+      style: style,
+      data: data,
+      options: options,
+      redraw: redraw
+    });
   };
 
   /**
@@ -27729,12 +27719,6 @@ function chart_Chart(props) {
     }
     return /*#__PURE__*/(0,jsx_runtime.jsx)("div", {});
   };
-
-  // Effect hook to add and remove event listeners
-  useEffect(function () {
-    // Prep ChartJS
-    Chart.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, plugin_title, plugin_tooltip, ArcElement);
-  }, []);
   return renderChartContainer();
 }
 
@@ -27761,7 +27745,7 @@ chart_Chart.defaultProps = {
 /**
  * Create a container to visualize a GeoChart in a standalone manner.
  *
- * @returns {JSX.Elemet} the element that has the GeoChart
+ * @returns {JSX.Element} the element that has the GeoChart
  */
 function App() {
   // Fetch the cgpv module
@@ -27781,6 +27765,10 @@ function App() {
     _useState4 = _slicedToArray(_useState3, 2),
     options = _useState4[0],
     setOptions = _useState4[1];
+
+  /**
+   * Handles when the Chart has to be loaded with data or options.
+   */
   var handleChartLoad = function handleChartLoad(e) {
     var ev = e;
     if (ev.detail.data) {
@@ -27790,6 +27778,12 @@ function App() {
       setOptions(ev.detail.options);
     }
   };
+
+  /**
+   * Handles an error that happened in the Chart component.
+   * @param dataErrors The data errors that happened (if any)
+   * @param optionsErrors The options errors that happened (if any)
+   */
   var handleError = function handleError(dataErrors, optionsErrors) {
     var _dataErrors$errors, _optionsErrors$errors;
     // Gather all error messages
@@ -27811,9 +27805,17 @@ function App() {
     console.error(dataErrors.errors, optionsErrors.errors);
     alert('There was an error parsing the Chart inputs. View console for details.');
   };
+
+  /**
+   * Handles when the Chart X Axis has changed.
+   */
   var handleChartXAxisChanged = function handleChartXAxisChanged() {
     console.log('Handle Chart X Axis');
   };
+
+  /**
+   * Handles when the Chart Y Axis has changed.
+   */
   var handleChartYAxisChanged = function handleChartYAxisChanged() {
     console.log('Handle Chart Y Axis');
   };
@@ -27826,7 +27828,7 @@ function App() {
     };
   });
 
-  // Render
+  // Render the Chart
   return /*#__PURE__*/(0,jsx_runtime.jsx)(chart_Chart, {
     style: {
       width: 800
