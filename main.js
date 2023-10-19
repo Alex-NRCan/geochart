@@ -27557,7 +27557,6 @@ function chart_Chart(props) {
     redraw = _useState2[0],
     setRedraw = _useState2[1];
   var chartRef = useRef(null);
-  // const [selectedDatasets, setSelectedDatasets] = useState();
 
   /**
    * Handles when the X Slider changes
@@ -27747,14 +27746,32 @@ function chart_Chart(props) {
   //
 
   // If options and data are specified
+  var resOptions;
+  var resData;
   if (options && data) {
     // Validate the data and options as received
     var validator = new ChartValidator();
-    var resOptions = validator.validateOptions(options);
-    var resData = validator.validateData(data);
+    resOptions = validator.validateOptions(options) || undefined;
+    resData = validator.validateData(data);
+  }
 
+  // Effect hook to raise the error on the correct React state.
+  // This is because it's quite probable the handling of the error will want to modify the state of another
+  // component (e.g. Snackbar) and React will throw a warning if this is not done in the useEffect().
+  useEffect(function () {
+    // If the options or data schemas were checked and had errors
+    if (resData && resOptions && (!resData.valid || !resOptions.valid)) {
+      // If a callback is defined
+      handleError === null || handleError === void 0 || handleError(resData, resOptions);
+      console.error(resData, resOptions);
+    }
+  }, [handleError, resData, resOptions]);
+
+  // If options and data are specified
+  if (options && data) {
+    var _resOptions, _resData;
     // If no errors
-    if (resOptions.valid && resData.valid) {
+    if ((_resOptions = resOptions) !== null && _resOptions !== void 0 && _resOptions.valid && (_resData = resData) !== null && _resData !== void 0 && _resData.valid) {
       // If redraw is true, reset the property, set the redraw property to true for the chart, then prep a timer to reset it to false after the redraw has happened.
       // A bit funky, but as documented online.
       if (elAction !== null && elAction !== void 0 && elAction.shouldRedraw) {
@@ -27768,10 +27785,6 @@ function chart_Chart(props) {
       // Render the chart
       return renderChartContainer();
     }
-
-    // If a callback is defined
-    handleError === null || handleError === void 0 || handleError(resData, resOptions);
-    console.error(resData, resOptions);
 
     // Failed to render
     return renderChartContainerFailed();
