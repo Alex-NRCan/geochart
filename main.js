@@ -27516,7 +27516,6 @@ function chart_Chart(props) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   var w = window;
   var cgpv = w.cgpv;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   var _cgpv$react = cgpv.react,
     useEffect = _cgpv$react.useEffect,
     useState = _cgpv$react.useState,
@@ -27742,7 +27741,7 @@ function chart_Chart(props) {
   };
 
   //
-  // PROCEED WITH RENDERING HERE!
+  // PROCEED WITH LOGIC HERE!
   //
 
   // If options and data are specified
