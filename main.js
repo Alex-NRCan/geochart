@@ -27309,6 +27309,7 @@ function SchemaValidator() {
   _classCallCheck(this, SchemaValidator);
   /**
    * Validates the data input parameters.
+   * @param data object the data json object to validate
    */
   _defineProperty(this, "validateData", function (data) {
     // Redirect
@@ -27316,6 +27317,7 @@ function SchemaValidator() {
   });
   /**
    * Validates the options input parameters.
+   * @param options object the options json object to validate
    */
   _defineProperty(this, "validateOptions", function (options) {
     // Redirect
@@ -27323,6 +27325,8 @@ function SchemaValidator() {
   });
   /**
    * Validates the a jsonObj using a schema validator.
+   * @param schema object the schema validator json to validate the jsonObj with
+   * @param jsonObj object the json object to validate
    */
   _defineProperty(this, "validateJsonSchema", function (schema, jsonObj) {
     var _validate$errors;
@@ -27347,6 +27351,7 @@ function SchemaValidator() {
 _class = SchemaValidator;
 /**
  * Returns a string representation of the errors of all ValidatorResult objects.
+ * @param valRes ValidatorResult[] the list of validation results to read and put to string
  */
 _defineProperty(SchemaValidator, "parseValidatorResultsMessages", function (valRes) {
   // Gather all error messages for data input
@@ -27359,6 +27364,7 @@ _defineProperty(SchemaValidator, "parseValidatorResultsMessages", function (valR
 });
 /**
  * Returns a string representation of the error in the ValidatorResult object.
+ * @param valRes ValidatorResult the validation result to read and put to string
  */
 _defineProperty(SchemaValidator, "parseValidatorResultMessage", function (valRes) {
   var _valRes$errors;
@@ -27391,6 +27397,10 @@ function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t =
  * SX Classes for the Chart
  */
 var sxClasses = {
+  chartError: {
+    fontStyle: 'italic',
+    color: 'red'
+  },
   checkDatasetWrapper: {
     display: 'inline-block'
   },
@@ -27503,8 +27513,8 @@ function chart_Chart(props) {
   };
 
   /**
-   * Renders the X Chart Slider JSX.Element or an empty div
-   * @returns The X Chart Slider JSX.Element or an empty div
+   * Renders the X Chart Slider JSX.Element or an empty box
+   * @returns The X Chart Slider JSX.Element or an empty box
    */
   var renderXSlider = function renderXSlider() {
     var xSlider = options.geochart.xSlider;
@@ -27524,12 +27534,12 @@ function chart_Chart(props) {
       });
     }
     // None
-    return /*#__PURE__*/(0,jsx_runtime.jsx)("div", {});
+    return /*#__PURE__*/(0,jsx_runtime.jsx)(Box_Box, {});
   };
 
   /**
-   * Renders the Y Chart Slider JSX.Element or an empty div
-   * @returns The Y Chart Slider JSX.Element or an empty div
+   * Renders the Y Chart Slider JSX.Element or an empty box
+   * @returns The Y Chart Slider JSX.Element or an empty box
    */
   var renderYSlider = function renderYSlider() {
     var ySlider = options.geochart.ySlider;
@@ -27550,7 +27560,7 @@ function chart_Chart(props) {
       });
     }
     // None
-    return /*#__PURE__*/(0,jsx_runtime.jsx)("div", {});
+    return /*#__PURE__*/(0,jsx_runtime.jsx)(Box_Box, {});
   };
 
   /**
@@ -27561,7 +27571,7 @@ function chart_Chart(props) {
     var _ref = data,
       datasets = _ref.datasets;
     if (datasets.length > 1) {
-      return /*#__PURE__*/(0,jsx_runtime.jsx)("div", {
+      return /*#__PURE__*/(0,jsx_runtime.jsx)(Box_Box, {
         children: datasets.map(function (ds, idx) {
           // Find a color for the legend based on the dataset info
           var color = Chart.defaults.color;
@@ -27593,12 +27603,12 @@ function chart_Chart(props) {
       });
     }
     // None
-    return /*#__PURE__*/(0,jsx_runtime.jsx)("div", {});
+    return /*#__PURE__*/(0,jsx_runtime.jsx)(Box_Box, {});
   };
 
   /**
-   * Renders the whole Chart container JSX.Element or an empty div
-   * @returns The whole Chart container JSX.Element or an empty div
+   * Renders the whole Chart container JSX.Element or an empty box
+   * @returns The whole Chart container JSX.Element or an empty box
    */
   var renderChartContainer = function renderChartContainer() {
     if (options.geochart && data !== null && data !== void 0 && data.datasets) {
@@ -27624,19 +27634,16 @@ function chart_Chart(props) {
         })]
       });
     }
-    return /*#__PURE__*/(0,jsx_runtime.jsx)("div", {});
+    return /*#__PURE__*/(0,jsx_runtime.jsx)(Box_Box, {});
   };
 
   /**
-   * Renders the whole Chart container JSX.Element or an empty div
-   * @returns The whole Chart container JSX.Element or an empty div
+   * Renders the whole Chart container JSX.Element or an empty box
+   * @returns The whole Chart container JSX.Element or an empty box
    */
   var renderChartContainerFailed = function renderChartContainerFailed() {
-    return /*#__PURE__*/(0,jsx_runtime.jsx)("div", {
-      style: {
-        fontStyle: 'italic',
-        color: 'red'
-      },
+    return /*#__PURE__*/(0,jsx_runtime.jsx)(Box_Box, {
+      sx: sxClasses.chartError,
       children: "Error rendering the Chart. Check console for details."
     });
   };
@@ -27691,7 +27698,7 @@ function chart_Chart(props) {
   }
 
   // Nothing to render, no errors either
-  return /*#__PURE__*/(0,jsx_runtime.jsx)("div", {});
+  return /*#__PURE__*/(0,jsx_runtime.jsx)(Box_Box, {});
 }
 
 /**
