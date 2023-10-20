@@ -27528,7 +27528,6 @@ function chart_Chart(props) {
           min: xSlider.min || 0,
           max: xSlider.max || 100,
           value: xSlider.value || 0,
-          track: xSlider.track || false,
           customOnChange: handleSliderXChange
         })
       });
@@ -27553,7 +27552,6 @@ function chart_Chart(props) {
           min: ySlider.min || 0,
           max: ySlider.max || 100,
           value: ySlider.value || 0,
-          track: ySlider.track || false,
           orientation: "vertical",
           customOnChange: handleSliderYChange
         })
