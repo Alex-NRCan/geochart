@@ -63,16 +63,6 @@
       };
 
       const DATA_NATIVE_4 = {
-        datasets: [{
-          data: {
-            January: 10,
-            February: 20,
-            March: 30
-          }
-        }]
-      };
-
-      const DATA_NATIVE_5 = {
         labels: ['Red', 'Blue', 'Yellow'],
         datasets: [{
           data: [{"x": 10, "y": 15}, {"x": 15, "y": 25}, {"x": 20, "y": 10}]
@@ -152,7 +142,7 @@
             type: 'time'
           },
         }
-      };</script><script defer="defer" src="main.js"></script></head><body><div class="" style="text-align: center;"><div style="background-color: aliceblue;"><div style="text-align: left;">GEOCHART INPUTS</div><div><div style="display:inline-block;width:49%;"><div><button onclick="importDataParsed(DATA_NATIVE_1)">Import Data 1 rec</button> <button onclick="importDataParsed(DATA_NATIVE_2)">Import Data 2 recs</button> <button onclick="importDataParsed(DATA_NATIVE_3)">Import Data 2 recs w/ steps</button> <button onclick="importDataParsed(DATA_NATIVE_4)">Import Data using object</button> <button onclick="importDataParsed(DATA_NATIVE_5)">Import Data using x,y</button></div><div><textarea id="CHARTDATAPARSED" rows="20" style="width: 100%;"></textarea></div></div><div style="display:inline-block;width:49%;"><div><button onclick="importOptionsParsed(OPTIONS_NATIVE_1_A)">Import Options Line (default)</button> <button onclick="importOptionsParsed(OPTIONS_NATIVE_1_B)">Import Options Bar</button> <button onclick="importOptionsParsed(OPTIONS_NATIVE_1_C)">Import Options Pie</button> <button onclick="importOptionsParsed(OPTIONS_NATIVE_1_D)">Import Options Doughnut</button> <button onclick="importOptionsParsed(OPTIONS_NATIVE_2)">Import Options Line w/ Sliders</button> <button onclick="importOptionsParsed(OPTIONS_NATIVE_3)">Import Options All-in</button></div><div><textarea id="CHARTOPTIONSPARSED" rows="20" style="width: 100%;"></textarea></div></div></div></div><div><button onclick="buildChart()" style="padding:5px;"><strong>BUILD CHART FROM CHART INPUTS</strong></button></div></div><script>function importDataParsed(data) {
+      };</script><script defer="defer" src="main.js"></script></head><body><div class="" style="text-align: center;"><div style="background-color: aliceblue;"><div style="text-align: left;">GEOCHART INPUTS</div><div><div style="display:inline-block;width:49%;"><div><button onclick="importDataParsed(DATA_NATIVE_1)">Import Data 1 rec</button> <button onclick="importDataParsed(DATA_NATIVE_2)">Import Data 2 recs</button> <button onclick="importDataParsed(DATA_NATIVE_3)">Import Data 2 recs w/ steps</button> <button onclick="importDataParsed(DATA_NATIVE_4)">Import Data using x,y</button></div><div><textarea id="CHARTDATAPARSED" rows="20" style="width: 100%;"></textarea></div></div><div style="display:inline-block;width:49%;"><div><button onclick="importOptionsParsed(OPTIONS_NATIVE_1_A)">Import Options Line (default)</button> <button onclick="importOptionsParsed(OPTIONS_NATIVE_1_B)">Import Options Bar</button> <button onclick="importOptionsParsed(OPTIONS_NATIVE_1_C)">Import Options Pie</button> <button onclick="importOptionsParsed(OPTIONS_NATIVE_1_D)">Import Options Doughnut</button> <button onclick="importOptionsParsed(OPTIONS_NATIVE_2)">Import Options Line w/ Sliders</button> <button onclick="importOptionsParsed(OPTIONS_NATIVE_3)">Import Options All-in</button></div><div><textarea id="CHARTOPTIONSPARSED" rows="20" style="width: 100%;"></textarea></div></div></div></div><div><button onclick="buildChart()" style="padding:5px;"><strong>BUILD CHART FROM CHART INPUTS</strong></button></div></div><script>function importDataParsed(data) {
         document.getElementById('CHARTDATAPARSED').value = JSON.stringify(data, null, 2);
       }
 
@@ -182,7 +172,14 @@
         }
 
         // Emit a Chart Changed event so the chart updates
+        // This is not using the conventional way to communicate with the Chart.
         window.dispatchEvent(new CustomEvent("chart/load", {detail: { data, options }}));
+      }
+
+      function redrawChart() {
+        // Emit a Chart Redraw event so the chart updates
+        // This is not using the conventional way to communicate with the Chart.
+        window.dispatchEvent(new CustomEvent("chart/redraw"));
       }
 
       // Load data 1
@@ -193,4 +190,4 @@
       // Hacky, but it's only to load default values off the start. It is also because we don't have a cgpv.init callback.
       setTimeout(() => {
         buildChart();
-      }, 1000);</script><div id="root2aca7b6b288c"></div></body></html>
+      }, 1000);</script><div id="root2aca7b6b288c"></div><div><button onclick="redrawChart()" style="padding:5px;"><strong>LOOKS WEIRD? REDRAW!</strong></button></div></body></html>
