@@ -28907,7 +28907,7 @@ var __webpack_exports__ = {};
 (() => {
 "use strict";
 
-// UNUSED EXPORTS: DEFAULT_COLOR_PALETTE, GeoChart, SchemaValidator, parseInputPropsIntoChartJS
+// UNUSED EXPORTS: DEFAULT_COLOR_PALETTE, GeoChart, SchemaValidator, createChartJSData, createChartJSOptions
 
 ;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/arrayWithHoles.js
 function _arrayWithHoles(arr) {
@@ -44102,9 +44102,6 @@ adapters._date.override(typeof (moment_default()) === 'function' ? {
  * Options for the Slider Axis component
  */
 /**
- * Definition of a result of Parsing the inputs
- */
-/**
  * The default color palette to be used when no color palette is specified
  */
 var DEFAULT_COLOR_PALETTE = ['orange', 'lightblue', 'green', 'pink', 'bisque', 'limegreen', 'hotpink', 'purple'];
@@ -44128,6 +44125,7 @@ function sortOnX(datasets) {
       }
       return a.x - b.x;
     });
+
     // Replace
     // eslint-disable-next-line no-param-reassign
     ds.data = dataOrdered;
@@ -44199,14 +44197,15 @@ function createDataXYFormat(attributes, chartConfig) {
     y: valRawY
   };
 }
-function createDatasets(chartConfig, records) {
+function createDatasets(chartConfig, datasource, records) {
   // Transform the TypeFeatureJson data to ChartData<TType, TData, string>
   var result = {
+    labels: [],
     datasets: []
   };
 
   // If special case of datasource format
-  if (chartConfig.datasource.format === 'compressed') {
+  if (datasource.format === 'compressed') {
     var _chartConfig$geochart4;
     // 1 feature = 1 dataset, but each feature has more than 1 attribute/value
     records.forEach(function (item, idx) {
@@ -44222,7 +44221,6 @@ function createDatasets(chartConfig, records) {
     // If have prop label
     if ((_chartConfig$geochart4 = chartConfig.geochart.xAxis) !== null && _chartConfig$geochart4 !== void 0 && _chartConfig$geochart4.property && chartConfig.geochart.xAxis.property in records[0]) result.labels = records[0][chartConfig.geochart.xAxis.property].split(';');
   } else {
-    var _chartConfig$geochart5;
     // Regular case with attributes
     // If we categorize
     // eslint-disable-next-line no-lonely-if
@@ -44265,14 +44263,6 @@ function createDatasets(chartConfig, records) {
         d.push(dataParsed);
       });
     }
-
-    // At this point, Datasets are created
-
-    // If the x axis type is time
-    if (((_chartConfig$geochart5 = chartConfig.geochart.xAxis) === null || _chartConfig$geochart5 === void 0 ? void 0 : _chartConfig$geochart5.type) === 'time') {
-      // Sort on X
-      sortOnX(result.datasets);
-    }
   }
 
   // Return result
@@ -44280,27 +44270,22 @@ function createDatasets(chartConfig, records) {
 }
 
 /**
- * Formats the Input Props into ChartJS ingestable Data and Options properties.
- * @param chartConfig The GeoChart Inputs to use to build the ChartJS ingestable information
- * @returns The ChartJS ingestable Data and Options properties
+ * Creates the ChartJS Options object necessary for ChartJS process.
+ * @param chartConfig The GeoChart Inputs to use to build the ChartJS ingestable information.
+ * @param defaultOptions The default, basic, necessary Options for ChartJS.
+ * @returns The ChartJS ingestable Options properties
  */
-function parseInputPropsIntoChartJS(chartConfig, records, defaultOptions, defaultData) {
-  var _chartConfig$geochart6;
+function createChartJSOptions(chartConfig, defaultOptions) {
+  var _chartConfig$geochart5;
+  // The Chart JS Options as entered or the default options
+  var options = chartConfig.chartjsOptions || _objectSpread({}, defaultOptions);
+
   // If no palette was specified, use the default
   // eslint-disable-next-line no-param-reassign
   if (!chartConfig.geochart.color_palette) chartConfig.geochart.color_palette = DEFAULT_COLOR_PALETTE;
 
-  // If there's a data source, parse it to a GeoChart data
-  var data = _objectSpread({}, defaultData);
-  if (records && records.length > 0) {
-    data = createDatasets(chartConfig, records);
-  }
-
-  // The Chart JS Options as entered
-  var options = chartConfig.chartjsOptions || _objectSpread({}, defaultOptions);
-
-  // If using a time series
-  if (((_chartConfig$geochart6 = chartConfig.geochart.xAxis) === null || _chartConfig$geochart6 === void 0 ? void 0 : _chartConfig$geochart6.type) === 'time') {
+  // If line and using a time series
+  if (chartConfig.chart === 'line' && ((_chartConfig$geochart5 = chartConfig.geochart.xAxis) === null || _chartConfig$geochart5 === void 0 ? void 0 : _chartConfig$geochart5.type) === 'time') {
     options.scales = {
       x: {
         type: 'time',
@@ -44322,11 +44307,33 @@ function parseInputPropsIntoChartJS(chartConfig, records, defaultOptions, defaul
     };
   }
 
+  // Return the ChartJS Options
+  return options;
+}
+
+/**
+ * Creates the ChartJS Data object necessary for ChartJS process.
+ * @param chartConfig The GeoChart Inputs to use to build the ChartJS ingestable information.
+ * @param records The Records to build the data from.
+ * @param defaultData The default, basic, necessary Data for ChartJS.
+ * @returns The ChartJS ingestable Data properties
+ */
+function createChartJSData(chartConfig, datasource, records, defaultData) {
+  var _chartConfig$geochart6;
+  // If there's a data source, parse it to a GeoChart data
+  var data = _objectSpread({}, defaultData);
+  if (records && records.length > 0) {
+    data = createDatasets(chartConfig, datasource, records);
+  }
+
+  // If the x axis type is time
+  if (((_chartConfig$geochart6 = chartConfig.geochart.xAxis) === null || _chartConfig$geochart6 === void 0 ? void 0 : _chartConfig$geochart6.type) === 'time') {
+    // Sort on X
+    sortOnX(data.datasets);
+  }
+
   // GeoChart Parsed information
-  return {
-    options: options,
-    data: data
-  };
+  return data;
 }
 // EXTERNAL MODULE: ./node_modules/react/jsx-runtime.js
 var jsx_runtime = __webpack_require__(8521);
@@ -44391,6 +44398,8 @@ function GeoChart(props) {
     Box = _cgpv$ui$elements.Box,
     Grid = _cgpv$ui$elements.Grid,
     Checkbox = _cgpv$ui$elements.Checkbox,
+    Select = _cgpv$ui$elements.Select,
+    MenuItem = _cgpv$ui$elements.MenuItem,
     Typography = _cgpv$ui$elements.Typography,
     Slider = _cgpv$ui$elements.SliderBase;
   var elStyle = props.style,
@@ -44402,6 +44411,7 @@ function GeoChart(props) {
     action = props.action,
     defaultColors = props.defaultColors,
     onParsed = props.onParsed,
+    onDatasourceChanged = props.onDatasourceChanged,
     onDatasetChanged = props.onDatasetChanged,
     onSliderXChanged = props.onSliderXChanged,
     onSliderYChanged = props.onSliderYChanged,
@@ -44415,7 +44425,7 @@ function GeoChart(props) {
   // Either I use the 'useState' from React (which runs, even from within GeoView Core, but causes some confusion with ESLint and useEffect when combining offical react and cgpv.react)
   // or I have to declare constants using type assertions like below. Discuss.
 
-  // STATE / REF SECTION *******
+  // STATE / REF SECTION *********************************************************************************************
   var _ref = useState(parentInputs),
     _ref2 = _slicedToArray(_ref, 2),
     inputs = _ref2[0],
@@ -44424,64 +44434,80 @@ function GeoChart(props) {
     _ref4 = _slicedToArray(_ref3, 2),
     chartType = _ref4[0],
     setChartType = _ref4[1];
-  var _ref5 = useState(parentOptions),
+  var _ref5 = useState(),
     _ref6 = _slicedToArray(_ref5, 2),
-    chartOptions = _ref6[0],
-    setChartOptions = _ref6[1];
-  var _ref7 = useState(parentData),
+    selectedDatasource = _ref6[0],
+    setSelectedDatasource = _ref6[1];
+  var _ref7 = useState(parentOptions),
     _ref8 = _slicedToArray(_ref7, 2),
-    chartData = _ref8[0],
-    setChartData = _ref8[1];
-  var _ref9 = useState(action === null || action === void 0 ? void 0 : action.shouldRedraw),
+    chartOptions = _ref8[0],
+    setChartOptions = _ref8[1];
+  var _ref9 = useState(parentData),
     _ref10 = _slicedToArray(_ref9, 2),
-    redraw = _ref10[0],
-    setRedraw = _ref10[1];
-  var _ref11 = useState(),
+    chartData = _ref10[0],
+    setChartData = _ref10[1];
+  var _ref11 = useState(action === null || action === void 0 ? void 0 : action.shouldRedraw),
     _ref12 = _slicedToArray(_ref11, 2),
-    filteredRecords = _ref12[0],
-    setFilteredRecords = _ref12[1];
+    redraw = _ref12[0],
+    setRedraw = _ref12[1];
   var _ref13 = useState(),
     _ref14 = _slicedToArray(_ref13, 2),
-    xSliderMin = _ref14[0],
-    setXSliderMin = _ref14[1];
-  var _ref15 = useState(),
+    filteredRecords = _ref14[0],
+    setFilteredRecords = _ref14[1];
+  var _ref15 = useState(0),
     _ref16 = _slicedToArray(_ref15, 2),
-    xSliderMax = _ref16[0],
-    setXSliderMax = _ref16[1];
-  var _ref17 = useState(),
+    xSliderMin = _ref16[0],
+    setXSliderMin = _ref16[1];
+  var _ref17 = useState(0),
     _ref18 = _slicedToArray(_ref17, 2),
-    xSliderValues = _ref18[0],
-    setXSliderValues = _ref18[1];
-  var _ref19 = useState(),
+    xSliderMax = _ref18[0],
+    setXSliderMax = _ref18[1];
+  var _ref19 = useState(0),
     _ref20 = _slicedToArray(_ref19, 2),
-    ySliderMin = _ref20[0],
-    setYSliderMin = _ref20[1];
-  var _ref21 = useState(),
+    xSliderValues = _ref20[0],
+    setXSliderValues = _ref20[1];
+  var _ref21 = useState(0),
     _ref22 = _slicedToArray(_ref21, 2),
-    ySliderMax = _ref22[0],
-    setYSliderMax = _ref22[1];
-  var _ref23 = useState(),
+    ySliderMin = _ref22[0],
+    setYSliderMin = _ref22[1];
+  var _ref23 = useState(0),
     _ref24 = _slicedToArray(_ref23, 2),
-    ySliderValues = _ref24[0],
-    setYSliderValues = _ref24[1];
-  var _ref25 = useState(),
+    ySliderMax = _ref24[0],
+    setYSliderMax = _ref24[1];
+  var _ref25 = useState(0),
     _ref26 = _slicedToArray(_ref25, 2),
-    validatorInputs = _ref26[0],
-    setValidatorInputs = _ref26[1];
+    ySliderValues = _ref26[0],
+    setYSliderValues = _ref26[1];
   var _ref27 = useState(),
     _ref28 = _slicedToArray(_ref27, 2),
-    validatorOptions = _ref28[0],
-    setValidatorOptions = _ref28[1];
+    validatorInputs = _ref28[0],
+    setValidatorInputs = _ref28[1];
   var _ref29 = useState(),
     _ref30 = _slicedToArray(_ref29, 2),
-    validatorData = _ref30[0],
-    setValidatorData = _ref30[1];
+    validatorOptions = _ref30[0],
+    setValidatorOptions = _ref30[1];
+  var _ref31 = useState(),
+    _ref32 = _slicedToArray(_ref31, 2),
+    validatorData = _ref32[0],
+    setValidatorData = _ref32[1];
   var chartRef = useRef();
 
   // Attribute the ChartJS default colors
   if (defaultColors !== null && defaultColors !== void 0 && defaultColors.backgroundColor) Chart.defaults.backgroundColor = defaultColors === null || defaultColors === void 0 ? void 0 : defaultColors.backgroundColor;
   if (defaultColors !== null && defaultColors !== void 0 && defaultColors.borderColor) Chart.defaults.borderColor = defaultColors === null || defaultColors === void 0 ? void 0 : defaultColors.borderColor;
   if (defaultColors !== null && defaultColors !== void 0 && defaultColors.color) Chart.defaults.color = defaultColors === null || defaultColors === void 0 ? void 0 : defaultColors.color;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  var handleDatasourceChanged = function handleDatasourceChanged(e, item) {
+    // Set the new datasource
+    var ds = inputs.datasources.find(function (x) {
+      return (x.value || x.display) === item.props.value;
+    });
+    setSelectedDatasource(ds);
+
+    // Callback
+    onDatasourceChanged === null || onDatasourceChanged === void 0 || onDatasourceChanged(ds);
+  };
 
   /**
    * Handles when the X Slider changes
@@ -44495,7 +44521,7 @@ function GeoChart(props) {
       var theDateTo = new Date(newValue[1]);
 
       // Filter the datasource.items using datasource.items
-      var resItems = inputs.datasource.items.filter(function (item) {
+      var resItems = selectedDatasource.items.filter(function (item) {
         var d = new Date(item[inputs.geochart.xAxis.property]);
         return theDateFrom <= d && d <= theDateTo;
       });
@@ -44576,7 +44602,7 @@ function GeoChart(props) {
    */
   var renderXSlider = function renderXSlider() {
     // If inputs
-    if (inputs) {
+    if (inputs && selectedDatasource) {
       var _inputs$geochart$xSli;
       if (inputs.chart === 'line' && (_inputs$geochart$xSli = inputs.geochart.xSlider) !== null && _inputs$geochart$xSli !== void 0 && _inputs$geochart$xSli.display) {
         return /*#__PURE__*/(0,jsx_runtime.jsx)(Box, {
@@ -44601,7 +44627,7 @@ function GeoChart(props) {
    */
   var renderYSlider = function renderYSlider() {
     // If inputs
-    if (inputs) {
+    if (inputs && selectedDatasource) {
       var _inputs$geochart$ySli;
       if ((_inputs$geochart$ySli = inputs.geochart.ySlider) !== null && _inputs$geochart$ySli !== void 0 && _inputs$geochart$ySli.display) {
         // Need 100% height to occupy some space, otherwise it's crunched.
@@ -44618,6 +44644,33 @@ function GeoChart(props) {
           })
         });
       }
+    }
+    // None
+    return /*#__PURE__*/(0,jsx_runtime.jsx)(Box, {});
+  };
+
+  /**
+   * Renders the Features selector
+   * @returns The Features selector Element
+   */
+  var renderFeaturesSelector = function renderFeaturesSelector() {
+    if (inputs) {
+      return /*#__PURE__*/(0,jsx_runtime.jsx)(Box, {
+        children: /*#__PURE__*/(0,jsx_runtime.jsx)(Select, {
+          onChange: handleDatasourceChanged,
+          value: (selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.value) || (selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.display) || '',
+          children: inputs.datasources.map(function (s, idx) {
+            return (
+              /*#__PURE__*/
+              // eslint-disable-next-line react/no-array-index-key
+              (0,jsx_runtime.jsx)(MenuItem, {
+                value: s.value || s.display,
+                children: s.display || s.value
+              }, idx)
+            );
+          })
+        })
+      });
     }
     // None
     return /*#__PURE__*/(0,jsx_runtime.jsx)(Box, {});
@@ -44673,10 +44726,10 @@ function GeoChart(props) {
       return /*#__PURE__*/(0,jsx_runtime.jsxs)(Grid, {
         container: true,
         style: style,
-        children: [/*#__PURE__*/(0,jsx_runtime.jsx)(Grid, {
+        children: [/*#__PURE__*/(0,jsx_runtime.jsxs)(Grid, {
           item: true,
           xs: 12,
-          children: renderDatasetSelector()
+          children: [renderFeaturesSelector(), renderDatasetSelector()]
         }), /*#__PURE__*/(0,jsx_runtime.jsx)(Grid, {
           item: true,
           xs: 11,
@@ -44706,26 +44759,46 @@ function GeoChart(props) {
     });
   };
 
-  // Effect hook when the inputs change coming from the parent component.
+  // USE EFFECT SECTION *********************************************************************************************
+  // Effect hook when the inputs change - coming from the parent component.
   useEffect(function () {
-    console.log('USE EFFECT PARENT INPUTS', parentInputs);
+    // console.log('USE EFFECT PARENT INPUTS', parentInputs);
 
     // Refresh the inputs in this component
     setInputs(parentInputs);
 
+    // If parentInputs is specified
+    if (parentInputs) {
+      // Validate the schema of the received inputs
+      setValidatorInputs(schemaValidator.validateInputs(parentInputs));
+    }
+  }, [parentInputs, schemaValidator]);
+
+  // Effect hook when the inputs change - coming from this component.
+  useEffect(function () {
+    // console.log('USE EFFECT INPUTS', inputs);
+
+    // If inputs is specified
+    if (inputs) {
+      // Set the first datasource by default
+      setSelectedDatasource(inputs.datasources[0]);
+    }
+  }, [inputs]); // We only want to run effect when inputs and filtered records change. It'll trigger to much.
+
+  // Effect hook when the feature change - coming from this component.
+  useEffect(function () {
+    // console.log('USE EFFECT SELECTED DATASOURCE', selectedDatasource);
+
     // Clear any record filters
     setFilteredRecords(undefined);
 
-    // If parentInputs is specified
-    if (parentInputs) {
+    // If inputs is specified
+    if (selectedDatasource) {
       var _geochart$xSlider, _geochart$xAxis, _geochart$ySlider, _geochart$yAxis;
-      // Validate the schema of the received inputs
-      setValidatorInputs(schemaValidator.validateInputs(parentInputs));
-
       // If has a xSlider and property
-      if ((_geochart$xSlider = parentInputs.geochart.xSlider) !== null && _geochart$xSlider !== void 0 && _geochart$xSlider.display && (_geochart$xAxis = parentInputs.geochart.xAxis) !== null && _geochart$xAxis !== void 0 && _geochart$xAxis.property) {
-        var values = parentInputs === null || parentInputs === void 0 ? void 0 : parentInputs.datasource.items.map(function (x) {
-          return x[parentInputs.geochart.xAxis.property];
+      if ((_geochart$xSlider = inputs.geochart.xSlider) !== null && _geochart$xSlider !== void 0 && _geochart$xSlider.display && (_geochart$xAxis = inputs.geochart.xAxis) !== null && _geochart$xAxis !== void 0 && _geochart$xAxis.property) {
+        var values = selectedDatasource.items.map(function (x) {
+          return x[inputs.geochart.xAxis.property];
         });
         var minVal = Math.floor(Math.min.apply(Math, _toConsumableArray(values)));
         var maxVal = Math.ceil(Math.max.apply(Math, _toConsumableArray(values)));
@@ -44735,9 +44808,9 @@ function GeoChart(props) {
       }
 
       // If has a ySlider and property
-      if ((_geochart$ySlider = parentInputs.geochart.ySlider) !== null && _geochart$ySlider !== void 0 && _geochart$ySlider.display && (_geochart$yAxis = parentInputs.geochart.yAxis) !== null && _geochart$yAxis !== void 0 && _geochart$yAxis.property) {
-        var _values = parentInputs === null || parentInputs === void 0 ? void 0 : parentInputs.datasource.items.map(function (x) {
-          return x[parentInputs.geochart.yAxis.property];
+      if ((_geochart$ySlider = inputs.geochart.ySlider) !== null && _geochart$ySlider !== void 0 && _geochart$ySlider.display && (_geochart$yAxis = inputs.geochart.yAxis) !== null && _geochart$yAxis !== void 0 && _geochart$yAxis.property) {
+        var _values = selectedDatasource.items.map(function (x) {
+          return x[inputs.geochart.yAxis.property];
         });
         var _minVal = Math.floor(Math.min.apply(Math, _toConsumableArray(_values)));
         var _maxVal = Math.ceil(Math.max.apply(Math, _toConsumableArray(_values)));
@@ -44746,13 +44819,38 @@ function GeoChart(props) {
         setYSliderValues([_minVal, _maxVal]);
       }
     }
-  }, [parentInputs, schemaValidator]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDatasource]); // We only want to run effect when this changes.
 
-  // Effect hook when the inputs change coming from this component.
   useEffect(function () {
-    console.log('USE EFFECT PARENT CHARTJS INPUTS');
+    // console.log('USE EFFECT SELECTED DATASOURCE FILTERED RECORDS', selectedDatasource);
 
-    // Refresh the inputs in this component
+    // If inputs is specified
+    if (selectedDatasource) {
+      // If there are filtered items
+      var records = selectedDatasource.items;
+      if (filteredRecords) records = filteredRecords;
+
+      // Parse the data
+      var parsedOptions = createChartJSOptions(inputs, parentOptions);
+      var parsedData = createChartJSData(inputs, selectedDatasource, records, parentData);
+
+      // Callback
+      onParsed === null || onParsed === void 0 || onParsed(inputs.chart, parsedOptions, parsedData);
+
+      // Override
+      setChartType(inputs.chart);
+      setChartOptions(parsedOptions);
+      setChartData(parsedData);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDatasource, filteredRecords]); // We only want to run effect when this changes.
+
+  // Effect hook when the ChartJS native props change coming from this component.
+  useEffect(function () {
+    // console.log('USE EFFECT PARENT CHARTJS INPUTS');
+
+    // No need to refresh inputs. It's explicit that inputs should be cleared as they prevail on ChartJS states. So, the parent is clearing it.
     // setInputs(null);
 
     // Override
@@ -44761,34 +44859,9 @@ function GeoChart(props) {
     setChartData(parentData);
   }, [parentChart, parentOptions, parentData]);
 
-  // Effect hook when the inputs change coming from this component.
-  useEffect(function () {
-    console.log('USE EFFECT INPUTS', inputs);
-
-    // If inputs is specified
-    if (inputs) {
-      var _inputs$datasource;
-      // If there are filtered items
-      var chartRecords = inputs === null || inputs === void 0 || (_inputs$datasource = inputs.datasource) === null || _inputs$datasource === void 0 ? void 0 : _inputs$datasource.items;
-      if (filteredRecords) chartRecords = filteredRecords;
-
-      // Parse the data
-      var parsedInputs = parseInputPropsIntoChartJS(inputs, chartRecords, parentOptions, parentData);
-
-      // Callback
-      onParsed === null || onParsed === void 0 || onParsed(inputs.chart, parsedInputs.options, parsedInputs.data);
-
-      // Override
-      setChartType(inputs.chart);
-      setChartOptions(parsedInputs.options);
-      setChartData(parsedInputs.data);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputs, filteredRecords]); // We only want to run effect when inputs and filtered records change. Don't add 'onParsed', 'parentData', 'parentOptions'. It'll trigger to much.
-
   // Effect hook when the chartType, chartOptions, chartData change coming from this component.
   useEffect(function () {
-    console.log('USE EFFECT CHARTJS INPUTS', chartOptions, chartData);
+    // console.log('USE EFFECT CHARTJS INPUTS', chartOptions, chartData);
 
     // Validate the parsing we did do follow ChartJS schema validating
     setValidatorOptions(schemaValidator.validateOptions(chartOptions));
@@ -44797,7 +44870,7 @@ function GeoChart(props) {
 
   // Effect hook to validate the schemas of inputs
   useEffect(function () {
-    console.log('USE EFFECT VALIDATORS');
+    // console.log('USE EFFECT VALIDATORS');
 
     // If any error
     if (!hasValidSchemas()) {
@@ -44810,7 +44883,7 @@ function GeoChart(props) {
   }, [validatorInputs, validatorOptions, validatorData, hasValidSchemas]); // We only want to run effect when those change. Don't add 'onError' as dependency. It'll trigger too much.
 
   useEffect(function () {
-    console.log('USE EFFECT SHOULDREDRAW');
+    // console.log('USE EFFECT SHOULDREDRAW');
 
     // **********************
     // If redraw is true, reset the property, set the redraw property to true for the chart, then prep a timer to reset it to false after the redraw has happened.
@@ -44857,6 +44930,7 @@ GeoChart.defaultProps = {
   defaultColors: null,
   action: null,
   onParsed: null,
+  onDatasourceChanged: null,
   onDatasetChanged: null,
   onSliderXChanged: null,
   onSliderYChanged: null,

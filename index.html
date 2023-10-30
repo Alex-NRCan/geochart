@@ -18,7 +18,8 @@
           }
         },
         category: "Radionuclide_Radionucleide",
-        datasource: {
+        datasources: [{
+          display: "Feature 1",
           items: [
             {
               Location_Emplacement: 'Victoria',
@@ -69,7 +70,59 @@
               Activity_Activite_mBqm3: 3.2589,
               OBJECTID: 56880
             }]
-        },
+        },{
+          display: "Feature 2",
+          items: [
+            {
+              Location_Emplacement: 'Montreal',
+              CollectionStart_DebutPrelevement: 1678320000000,
+              Radionuclide_Radionucleide: '210Pb',
+              Activity_Activite_mBqm3: 2.7395,
+              OBJECTID: 56874
+            },
+            {
+              Location_Emplacement: 'Toronto',
+              CollectionStart_DebutPrelevement: 1669248000000,
+              Radionuclide_Radionucleide: '7Be',
+              Activity_Activite_mBqm3: 0.83,
+              OBJECTID: 56875
+            },
+            {
+              Location_Emplacement: 'Yellowknife',
+              CollectionStart_DebutPrelevement: 1679443200000,
+              Radionuclide_Radionucleide: '210Pb',
+              Activity_Activite_mBqm3: 1.0166,
+              OBJECTID: 56876
+            },
+            {
+              Location_Emplacement: 'Vancouver',
+              CollectionStart_DebutPrelevement: 1678406400000,
+              Radionuclide_Radionucleide: '210Pb',
+              Activity_Activite_mBqm3: 0.939,
+              OBJECTID: 56877
+            },
+            {
+              Location_Emplacement: 'Victoria',
+              CollectionStart_DebutPrelevement: 1679011200000,
+              Radionuclide_Radionucleide: '210Pb',
+              Activity_Activite_mBqm3: 1.1814,
+              OBJECTID: 56878
+            },
+            {
+              Location_Emplacement: 'Calgary',
+              CollectionStart_DebutPrelevement: 1677974400000,
+              Radionuclide_Radionucleide: '210Pb',
+              Activity_Activite_mBqm3: 0.6715,
+              OBJECTID: 56879
+            },
+            {
+              Location_Emplacement: 'Montreal',
+              CollectionStart_DebutPrelevement: 1668643200000,
+              Radionuclide_Radionucleide: '210Pb',
+              Activity_Activite_mBqm3: 3.2589,
+              OBJECTID: 56880
+            }]
+        }],
         chartjsOptions: {
           responsive: true,
           plugins: {
@@ -98,7 +151,9 @@
           }
         },
         category: 'Radionuclide_Radionucleide',
-        datasource: {
+        datasources: [{
+          value: "1",
+          display: "Feature 1",
           items: [
             {
               Location_Emplacement: 'Victoria',
@@ -150,7 +205,7 @@
               OBJECTID: 56880
             }
           ]
-        },
+        }],
         chartjsOptions: {
           responsive: true,
           plugins: {
@@ -179,7 +234,7 @@
             display: true,
           }
         },
-        datasource: {
+        datasources: [{
           format: 'compressed',
           items: [
           {
@@ -194,7 +249,7 @@
             data: '155;55;255',
             label: 'Red;Green;Blue'
           }]
-        },
+        }],
         chartjsOptions: {
           responsive: true,
           plugins: {
