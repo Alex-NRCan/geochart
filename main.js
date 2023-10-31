@@ -44919,11 +44919,8 @@ function GeoChart(props) {
       if (datasets.length > 1) {
         return /*#__PURE__*/(0,jsx_runtime.jsx)(Box, {
           children: datasets.map(function (ds, idx) {
-            // Find a color for the legend based on the dataset info
             var color = Chart.defaults.color;
             if (ds.borderColor) color = ds.borderColor;else if (ds.backgroundColor) color = ds.backgroundColor;
-
-            // Return the Legend item
             return /*#__PURE__*/(0,jsx_runtime.jsxs)(Box, {
               sx: sxClasses.checkDatasetWrapper,
               children: [/*#__PURE__*/(0,jsx_runtime.jsx)(Checkbox, {
