@@ -44095,7 +44095,7 @@ var getColorFromPalette = function getColorFromPalette(colorPalette, index) {
 };
 
 /**
- * Extracts the color value without an alpha layer.
+ * Extracts the color value without its alpha layer.
  * It accepts colors specified in hex, rgb() and rgba() formats.
  * @param color string The color to extract the value without the alpha layer
  * @returns string The opaque color equivalent in rbg() format.
@@ -44135,6 +44135,8 @@ var extractColor = function extractColor(color) {
     return "rgb(".concat(_r, ", ").concat(_g, ", ").concat(_b, ")");
   }
 
+  // TODO: Get rid of this code when determined that we really won't support color names written like 'red', 'green', etc.
+  // TO.DO.CONT: If we do want to support such naming convention, this code works.
   // // Handle named colors (like "red")
   // const opt = new Option();
   // opt.style.color = color;
@@ -44153,7 +44155,7 @@ var extractColor = function extractColor(color) {
 ;// CONCATENATED MODULE: ./src/chart-types.ts
 
 
-// Export all types higher
+// Export all ChartJS types
 
 // Simulate the types in cgpv
 // TODO: Refactor - Think about it, should I fetch cgpv even in ts classes to get the type?
@@ -44191,7 +44193,7 @@ var extractColor = function extractColor(color) {
 /**
  * Extending the DefaultDataPoint, because we support more than just x:number, y:number. Notably with the dates.
  */
-// TODO: Refactor - Try to push down the support of the Dates into the ChartJS ChartTypeRegistry thing, instead of bypassing the support by extending with a GeoChartXYPair type
+// TODO: Refactor - Low priority - Try to push down the support of the Dates into the ChartJS ChartTypeRegistry thing, instead of bypassing the support by extending with a GeoChartXYPair type
 /**
  * Indicates an action to be performed by the Chart.
  * Special type that allows the child component a accept a 'todo action' via props and reset the prop value without the parent being notified.
@@ -44402,8 +44404,8 @@ function createDatasetsLineBar(chartConfig, datasource, records) {
       // If new category
       if (!Object.keys(categoriesRead).includes(cat)) {
         // The colors to use
-        var backgroundColor = getColorFromPalette(chartConfig.category.palette_backgrounds, idx);
-        var borderColor = getColorFromPalette(chartConfig.category.palette_borders, idx);
+        var backgroundColor = getColorFromPalette(chartConfig.category.paletteBackgrounds, idx);
+        var borderColor = getColorFromPalette(chartConfig.category.paletteBorders, idx);
 
         // Create dataset
         var newDataset = createDataset(chartConfig, backgroundColor, borderColor, cat);
@@ -44423,8 +44425,8 @@ function createDatasetsLineBar(chartConfig, datasource, records) {
   } else {
     // 1 feature = 1 dataset
     // The colors to use
-    var backgroundColor = getColorFromPalette(chartConfig.geochart.xAxis.palette_backgrounds, 0);
-    var borderColor = getColorFromPalette(chartConfig.geochart.xAxis.palette_borders, 0);
+    var backgroundColor = getColorFromPalette(chartConfig.geochart.xAxis.paletteBackgrounds, 0);
+    var borderColor = getColorFromPalette(chartConfig.geochart.xAxis.paletteBorders, 0);
 
     // Create dataset
     var newDataset = createDataset(chartConfig, backgroundColor, borderColor, 'ALL');
@@ -44467,7 +44469,7 @@ function createDatasetsPieDoughnut(chartConfig, datasource, records) {
   var colorPaletteForAll = Array.from({
     length: returnedChartData.labels.length
   }, function (_, paletteIndex) {
-    return getColorFromPalette(chartConfig.geochart.xAxis.palette_backgrounds, paletteIndex);
+    return getColorFromPalette(chartConfig.geochart.xAxis.paletteBackgrounds, paletteIndex);
   });
 
   // If we categorize
@@ -44483,7 +44485,7 @@ function createDatasetsPieDoughnut(chartConfig, datasource, records) {
       if (!Object.keys(categoriesRead).includes(cat)) {
         // The colors to use
         var borderColor;
-        if (chartConfig.category.palette_borders) borderColor = getColorFromPalette(chartConfig.category.palette_borders, idx);
+        if (chartConfig.category.paletteBorders) borderColor = getColorFromPalette(chartConfig.category.paletteBorders, idx);
 
         // Create dataset
         var newDataset = createDataset(chartConfig, colorPaletteForAll, borderColor, cat);
@@ -44550,10 +44552,10 @@ function createDatasets(chartConfig, datasource, records) {
  * with the possible real display of the Chart. Indeed, ChartJS uses a default color palette when none is set and we'd like to
  * explicit that so that the rest of the UI can adapt to whatever color palette the Chart is 'really' using.
  * Logic goes:
- *   - when a palette_backgrounds or palette_borders are specified via the configuration, that's the palette that shall be used
- *   - when no palette_backgrounds or palette_borders are specified via the configuration, the ChartJS palette shall be explicitely
+ *   - when a paletteBackgrounds or paletteBorders are specified via the configuration, that's the palette that shall be used
+ *   - when no paletteBackgrounds or paletteBorders are specified via the configuration, the ChartJS palette shall be explicitely
  *     used (not letting ChartJS make it by magic).
- *   - when no palette_backgrounds or palette_borders are specified via the configuration, and usePalette is true, a custom palette
+ *   - when no paletteBackgrounds or paletteBorders are specified via the configuration, and usePalette is true, a custom palette
  *     is explicitely used.
  * @param chartConfig The GeoChart Inputs to use to build the ChartJS ingestable information.
  */
@@ -44561,43 +44563,43 @@ function createChartJSOptionsColorPalette(chartConfig) {
   // If there's a category
   if (chartConfig.category) {
     // If there's no background palettes
-    if (!chartConfig.category.palette_backgrounds) {
+    if (!chartConfig.category.paletteBackgrounds) {
       // For line or bar charts, set the ChartJS default color palette
       if (chartConfig.chart === 'line' || chartConfig.chart === 'bar') {
         // eslint-disable-next-line no-param-reassign
-        chartConfig.category.palette_backgrounds = DEFAULT_COLOR_PALETTE_CHARTJS_TRANSPARENT;
+        chartConfig.category.paletteBackgrounds = DEFAULT_COLOR_PALETTE_CHARTJS_TRANSPARENT;
       }
       // eslint-disable-next-line no-param-reassign
-      if (chartConfig.category.usePalette) chartConfig.category.palette_backgrounds = DEFAULT_COLOR_PALETTE_CUSTOM_TRANSPARENT;
+      if (chartConfig.category.usePalette) chartConfig.category.paletteBackgrounds = DEFAULT_COLOR_PALETTE_CUSTOM_TRANSPARENT;
     }
     // If there's no border palettes
-    if (!chartConfig.category.palette_borders) {
+    if (!chartConfig.category.paletteBorders) {
       // For line or bar charts, we may want to use ChartJS's color palette
       if (chartConfig.chart === 'line' || chartConfig.chart === 'bar') {
         // eslint-disable-next-line no-param-reassign
-        chartConfig.category.palette_borders = DEFAULT_COLOR_PALETTE_CHARTJS_OPAQUE;
+        chartConfig.category.paletteBorders = DEFAULT_COLOR_PALETTE_CHARTJS_OPAQUE;
       }
       // eslint-disable-next-line no-param-reassign
-      if (chartConfig.category.usePalette) chartConfig.category.palette_borders = DEFAULT_COLOR_PALETTE_CUSTOM_OPAQUE;
+      if (chartConfig.category.usePalette) chartConfig.category.paletteBorders = DEFAULT_COLOR_PALETTE_CUSTOM_OPAQUE;
     }
   }
 
   // If there's a X-Axis
   if (chartConfig.geochart.xAxis) {
     // If there's no background palettes
-    if (!chartConfig.geochart.xAxis.palette_backgrounds) {
+    if (!chartConfig.geochart.xAxis.paletteBackgrounds) {
       // eslint-disable-next-line no-param-reassign
-      chartConfig.geochart.xAxis.palette_backgrounds = DEFAULT_COLOR_PALETTE_CHARTJS_TRANSPARENT;
+      chartConfig.geochart.xAxis.paletteBackgrounds = DEFAULT_COLOR_PALETTE_CHARTJS_TRANSPARENT;
       if (chartConfig.geochart.xAxis.usePalette)
         // eslint-disable-next-line no-param-reassign
-        chartConfig.geochart.xAxis.palette_backgrounds = DEFAULT_COLOR_PALETTE_CUSTOM_ALT_TRANSPARENT;
+        chartConfig.geochart.xAxis.paletteBackgrounds = DEFAULT_COLOR_PALETTE_CUSTOM_ALT_TRANSPARENT;
     }
     // If there's no border palettes
-    if (!chartConfig.geochart.xAxis.palette_borders) {
+    if (!chartConfig.geochart.xAxis.paletteBorders) {
       // eslint-disable-next-line no-param-reassign
-      chartConfig.geochart.xAxis.palette_borders = DEFAULT_COLOR_PALETTE_CHARTJS_OPAQUE;
+      chartConfig.geochart.xAxis.paletteBorders = DEFAULT_COLOR_PALETTE_CHARTJS_OPAQUE;
       // eslint-disable-next-line no-param-reassign
-      if (chartConfig.geochart.xAxis.usePalette) chartConfig.geochart.xAxis.palette_borders = DEFAULT_COLOR_PALETTE_CUSTOM_ALT_OPAQUE;
+      if (chartConfig.geochart.xAxis.usePalette) chartConfig.geochart.xAxis.paletteBorders = DEFAULT_COLOR_PALETTE_CUSTOM_ALT_OPAQUE;
     }
   }
 }
@@ -44645,6 +44647,7 @@ function createChartJSOptions(chartConfig, defaultOptions) {
 
 /**
  * Creates the ChartJS Data object necessary for ChartJS process.
+ * When the xAxis reprensents time, the datasets are sorted by date.
  * @param chartConfig The GeoChart Inputs to use to build the ChartJS ingestable information.
  * @param records The Records to build the data from.
  * @param defaultData The default, basic, necessary Data for ChartJS.
@@ -44676,6 +44679,7 @@ var jsx_runtime = __webpack_require__(8521);
 function chart_ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function chart_objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? chart_ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : chart_ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 /* eslint-disable no-console */
+// TODO: Remove the no-console eslint above when component development stabilizes
 
 
 
@@ -44685,7 +44689,7 @@ function chart_objectSpread(e) { for (var r = 1; r < arguments.length; r++) { va
 // TEMPORARY VARIABLE FOR EASE OF DEBUGGING
 
 
-var LOGGING = 2;
+var LOGGING = 1;
 
 /**
  * Main props for the Chart
@@ -44719,7 +44723,7 @@ function GeoChart(props) {
   // Prep ChartJS
   Chart.register.apply(Chart, _toConsumableArray(registerables));
 
-  // Can't type the window object to a 'TypeWindow', because we don't have access to the cgpv library when this code runs.
+  // Can't type the window object to a 'TypeWindow', because we don't have access to the cgpv library when this line runs.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   var w = window;
   // Fetch the cgpv module
@@ -44769,10 +44773,8 @@ function GeoChart(props) {
 
   /** ***************************************** USE STATE SECTION START ************************************************ */
 
-  // TODO: Refactor - Check if we can have a 'useState<>' that's generic, because we end up with a lot of untyped variables if not careful like I'm doing below.
-  // Since 'useState' coming from cgpv doesn't handle generic types, here's some crazy typing :)
-  // Either I use the 'useState' from React (which runs, even from within GeoView Core, but causes some confusion with ESLint and useEffect when combining offical react and cgpv.react)
-  // or I have to declare constants using type assertions like below. Discuss.
+  // TODO: Refactor - Check why the useState coming from cgpv loses its generic property.
+  // TO.DO.CONT: Here's some crazy typing so that at least things remain typed instead of 'any'.
 
   var _ref = useState(parentInputs),
     _ref2 = _slicedToArray(_ref, 2),
@@ -45067,7 +45069,7 @@ function GeoChart(props) {
     };
   }, [inputs]);
 
-  // Effect hook when the inputs change - coming from this component.
+  // Effect hook when the selected datasource changes - coming from parent component.
   useEffect(function () {
     if (LOGGING >= 2) console.log('USE EFFECT PARENT DATASOURCE', parentDatasource);
 
@@ -45076,9 +45078,9 @@ function GeoChart(props) {
     return function () {
       if (LOGGING >= 5) console.log('USE EFFECT PARENT DATASOURCE - UNMOUNT', parentDatasource);
     };
-  }, [parentDatasource]); // We only want to run effect when datasource is changed by the parent.
+  }, [parentDatasource]);
 
-  // Effect hook when the feature change - coming from this component.
+  // Effect hook when the selected datasource changes - coming from this component.
   useEffect(function () {
     if (LOGGING >= 3) console.log('USE EFFECT SELECTED DATASOURCE', selectedDatasource);
 
@@ -45126,7 +45128,11 @@ function GeoChart(props) {
     return function () {
       if (LOGGING >= 5) console.log('USE EFFECT SELECTED DATASOURCE - UNMOUNT', selectedDatasource);
     };
-  }, [selectedDatasource]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [processLoadingRecords, selectedDatasource]); // No need for 'inputs' to be a dependency here, because when 'inputs' change, it will reset the selected datasource anyways
+
+  // Effect hook when the filtered records change - coming from this component.
   useEffect(function () {
     if (LOGGING >= 3) console.log('USE EFFECT SELECTED DATASOURCE FILTERED RECORDS', selectedDatasource);
 
@@ -45138,14 +45144,13 @@ function GeoChart(props) {
     return function () {
       if (LOGGING >= 5) console.log('USE EFFECT SELECTED DATASOURCE FILTERED RECORDS - UNMOUNT', selectedDatasource);
     };
-  }, [filteredRecords]);
 
-  // Effect hook when the ChartJS native props change coming from this component.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [processLoadingRecords, filteredRecords]); // No need for 'selectedDatasource' to be a dependency here, because when 'selectedDatasource' changes, it will reset the filters anyways
+
+  // Effect hook when the main props about charttype, options and data change - coming from parent component.
   useEffect(function () {
     if (LOGGING >= 2) console.log('USE EFFECT PARENT CHARTJS INPUTS');
-
-    // No need to refresh inputs. It's explicit that inputs should be cleared as they prevail on ChartJS states. So, the parent is clearing it.
-    // setInputs(null);
 
     // Override
     setChartType(parentChart);
@@ -45153,7 +45158,7 @@ function GeoChart(props) {
     setChartData(parentData);
   }, [parentChart, parentOptions, parentData]);
 
-  // Effect hook when the chartType, chartOptions, chartData change coming from this component.
+  // Effect hook when the chartOptions, chartData change - coming from this component.
   useEffect(function () {
     if (LOGGING >= 3) console.log('USE EFFECT CHARTJS OPTIONS+DATA', chartOptions, chartData);
 
@@ -45165,7 +45170,7 @@ function GeoChart(props) {
     performRedraw();
   }, [chartOptions, chartData, schemaValidator]);
 
-  // Effect hook to validate the schemas of inputs
+  // Effect hook to validate the schemas of inputs - coming from this component.
   useEffect(function () {
     if (LOGGING >= 4) console.log('USE EFFECT VALIDATORS');
 
@@ -45178,7 +45183,7 @@ function GeoChart(props) {
     }
   }, [validatorInputs, validatorOptions, validatorData, hasValidSchemas, onError]);
 
-  // Effect hook when an action needs to happen on this component.
+  // Effect hook when an action needs to happen - coming from this component.
   useEffect(function () {
     if (LOGGING >= 5) console.log('USE EFFECT ACTION');
 
@@ -45325,8 +45330,17 @@ function GeoChart(props) {
     if (chartData) {
       var datasets = chartData.datasets;
       if (datasets.length > 1) {
-        return /*#__PURE__*/(0,jsx_runtime.jsx)(Box, {
-          children: datasets.map(function (ds, idx) {
+        var label = chartType === 'pie' || chartType === 'doughnut' ? 'Category:' : '';
+        // The 9px padding here is because of alignment issues with the inner-padding used by the checkboxes components
+        return /*#__PURE__*/(0,jsx_runtime.jsxs)(Box, {
+          children: [/*#__PURE__*/(0,jsx_runtime.jsx)(Typography, {
+            sx: {
+              display: 'inline-block',
+              padding: '9px',
+              verticalAlign: 'middle'
+            },
+            children: label
+          }), datasets.map(function (ds, idx) {
             var color = Chart.defaults.color;
             if (ds.borderColor) color = ds.borderColor;else if ((chartType === 'line' || chartType === 'bar') && ds.backgroundColor) color = ds.backgroundColor;
             return /*#__PURE__*/(0,jsx_runtime.jsxs)(Box, {
@@ -45346,7 +45360,7 @@ function GeoChart(props) {
                 children: ds.label
               })]
             }, ds.label || idx);
-          })
+          })]
         });
       }
     }
@@ -45415,7 +45429,7 @@ function GeoChart(props) {
                 alignItems: 'center;'
               },
               children: [renderDatasourceSelector(), renderTitle()]
-            }), renderDatasetSelector(), renderDataSelector()]
+            }), renderDataSelector(), renderDatasetSelector()]
           }), /*#__PURE__*/(0,jsx_runtime.jsxs)(Grid, {
             item: true,
             sx: {
@@ -45661,7 +45675,7 @@ _defineProperty(SchemaValidator, "parseValidatorResultMessage", function (valRes
  * @returns {JSX.Element} the element that has the GeoChart
  */
 function App(props) {
-  // Can't type the window object to a 'TypeWindow', because we don't have access to the cgpv library when this code runs.
+  // Can't type the window object to a 'TypeWindow', because we don't have access to the cgpv library when this line runs.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   var w = window;
   // Fetch the cgpv module
@@ -45770,10 +45784,8 @@ function App(props) {
     if (dataErrors) msgs.push(dataErrors);
     var msgAll = SchemaValidator.parseValidatorResultsMessages(msgs);
 
-    // Show the error (actually, can't because the snackbar is linked to a map at the moment
-    // and geochart is standalone without a cgpv.init() at all)
-    // TODO: Refactor - Decide if we want the snackbar outside of a map or not and use showError or not
-    cgpv.api.utilities.showError('', msgAll);
+    // Show the error using an alert. We can't use the cgpv SnackBar as that component is attached to
+    // a map and we're not even running a cgpv.init() at all here.
     // eslint-disable-next-line no-alert
     alert("There was an error parsing the Chart inputs.\n\n".concat(msgAll, "\n\nView console for details."));
   };
@@ -45821,7 +45833,7 @@ function App(props) {
 // Search for a special root in case we are loading the geochart standalone
 var root = document.getElementById('root2aca7b6b288c');
 if (root) {
-  // Can't type the window object to a 'TypeWindow', because we don't have access to the cgpv library when this code runs.
+  // Can't type the window object to a 'TypeWindow', because we don't have access to the cgpv library when this line runs.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   var w = window;
   // Fetch the cgpv module
