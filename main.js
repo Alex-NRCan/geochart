@@ -44352,13 +44352,13 @@ function sortOnX(datasets) {
  * @returns The GeoChartXYData object
  */
 function createDataXYFormat(chartConfig, attributes) {
-  var _chartConfig$geochart;
+  var _chartConfig$geochart, _chartConfig$geochart2;
   // Read the unknown value in x
   var valRawX = attributes[chartConfig.geochart.xAxis.property];
 
   // If the value is expected to be a time
   var xVal = valRawX;
-  if (((_chartConfig$geochart = chartConfig.geochart.xAxis) === null || _chartConfig$geochart === void 0 ? void 0 : _chartConfig$geochart.type) === 'time') {
+  if (((_chartConfig$geochart = chartConfig.geochart.xAxis) === null || _chartConfig$geochart === void 0 ? void 0 : _chartConfig$geochart.type) === 'time' || ((_chartConfig$geochart2 = chartConfig.geochart.xAxis) === null || _chartConfig$geochart2 === void 0 ? void 0 : _chartConfig$geochart2.type) === 'timeseries') {
     // Make sure it's a date object
     if (valRawX instanceof Date) xVal = valRawX;
     if (chart_util_isNumber(valRawX)) xVal = new Date(valRawX);
@@ -44694,7 +44694,7 @@ function createChartJSOptionsColorPalette(chartConfig) {
  * @returns The ChartJS ingestable Options properties
  */
 function createChartJSOptions(chartConfig, defaultOptions, language) {
-  var _chartConfig$geochart2, _chartConfig$geochart3;
+  var _chartConfig$geochart3, _chartConfig$geochart4, _chartConfig$geochart6;
   // The Chart JS Options as entered or the default options
   var options = chartConfig.chartjsOptions || _objectSpread({}, defaultOptions);
 
@@ -44702,11 +44702,12 @@ function createChartJSOptions(chartConfig, defaultOptions, language) {
   createChartJSOptionsColorPalette(chartConfig);
 
   // If line and using a time series
-  if (chartConfig.chart === 'line' && ((_chartConfig$geochart2 = chartConfig.geochart.xAxis) === null || _chartConfig$geochart2 === void 0 ? void 0 : _chartConfig$geochart2.type) === 'time') {
+  if (chartConfig.chart === 'line' && (((_chartConfig$geochart3 = chartConfig.geochart.xAxis) === null || _chartConfig$geochart3 === void 0 ? void 0 : _chartConfig$geochart3.type) === 'time' || ((_chartConfig$geochart4 = chartConfig.geochart.xAxis) === null || _chartConfig$geochart4 === void 0 ? void 0 : _chartConfig$geochart4.type) === 'timeseries')) {
+    var _chartConfig$geochart5;
     var optionsLine = options;
     optionsLine.scales = _objectSpread(_objectSpread({}, optionsLine.scales), {}, {
       x: {
-        type: 'time',
+        type: (_chartConfig$geochart5 = chartConfig.geochart.xAxis) === null || _chartConfig$geochart5 === void 0 ? void 0 : _chartConfig$geochart5.type,
         ticks: {
           major: {
             enabled: true
@@ -44737,12 +44738,12 @@ function createChartJSOptions(chartConfig, defaultOptions, language) {
   }
 
   // If line and using a time series
-  if ((chartConfig.chart === 'line' || chartConfig.chart === 'bar') && (_chartConfig$geochart3 = chartConfig.geochart.yAxis) !== null && _chartConfig$geochart3 !== void 0 && _chartConfig$geochart3.type) {
-    var _chartConfig$geochart4;
+  if ((chartConfig.chart === 'line' || chartConfig.chart === 'bar') && (_chartConfig$geochart6 = chartConfig.geochart.yAxis) !== null && _chartConfig$geochart6 !== void 0 && _chartConfig$geochart6.type) {
+    var _chartConfig$geochart7;
     var _optionsLine = options;
     _optionsLine.scales = _objectSpread(_objectSpread({}, _optionsLine.scales), {}, {
       y: {
-        type: (_chartConfig$geochart4 = chartConfig.geochart.yAxis) === null || _chartConfig$geochart4 === void 0 ? void 0 : _chartConfig$geochart4.type
+        type: (_chartConfig$geochart7 = chartConfig.geochart.yAxis) === null || _chartConfig$geochart7 === void 0 ? void 0 : _chartConfig$geochart7.type
       }
     });
   }
@@ -44760,7 +44761,7 @@ function createChartJSOptions(chartConfig, defaultOptions, language) {
  * @returns The ChartJS ingestable Data properties
  */
 function createChartJSData(chartConfig, records, defaultData) {
-  var _chartConfig$geochart5;
+  var _chartConfig$geochart8, _chartConfig$geochart9;
   // If there's a data source, parse it to a GeoChart data
   var data = _objectSpread({}, defaultData);
   if (records && records.length > 0) {
@@ -44768,7 +44769,7 @@ function createChartJSData(chartConfig, records, defaultData) {
   }
 
   // If the x axis type is time
-  if (((_chartConfig$geochart5 = chartConfig.geochart.xAxis) === null || _chartConfig$geochart5 === void 0 ? void 0 : _chartConfig$geochart5.type) === 'time') {
+  if (((_chartConfig$geochart8 = chartConfig.geochart.xAxis) === null || _chartConfig$geochart8 === void 0 ? void 0 : _chartConfig$geochart8.type) === 'time' || ((_chartConfig$geochart9 = chartConfig.geochart.xAxis) === null || _chartConfig$geochart9 === void 0 ? void 0 : _chartConfig$geochart9.type) === 'timeseries') {
     // Make sure the datasets data are sorted on X
     sortOnX(data.datasets);
   }
@@ -44872,9 +44873,9 @@ var log = function log(level) {
   if (level <= LOGGING_LEVEL) (_console = console).log.apply(_console, ["".concat('-'.repeat(level), ">")].concat(message));
 };
 ;// CONCATENATED MODULE: ./locales/en/translation.json
-const translation_namespaceObject = JSON.parse('{"geochart":{"feature":"Feature","steps":"Steps","category":"Category"}}');
+const translation_namespaceObject = JSON.parse('{"geochart":{"feature":"Feature","steps":"Steps","category":"Category","parsingError":"There was an error parsing the Chart inputs.","viewConsoleDetails":"View console for details."}}');
 ;// CONCATENATED MODULE: ./locales/fr/translation.json
-const fr_translation_namespaceObject = JSON.parse('{"geochart":{"feature":"Enregistrement","steps":"Marches","category":"Catégorie"}}');
+const fr_translation_namespaceObject = JSON.parse('{"geochart":{"feature":"Enregistrement","steps":"Marches","category":"Catégorie","parsingError":"Une erreur est survenue lors de la lecture des paramètres.","viewConsoleDetails":"Voir détails dans la console."}}');
 // EXTERNAL MODULE: ./node_modules/react/jsx-runtime.js
 var jsx_runtime = __webpack_require__(8521);
 ;// CONCATENATED MODULE: ./src/chart.tsx
@@ -44932,7 +44933,6 @@ function GeoChart(props) {
     Slider = _cgpv$ui$elements.SliderBase,
     CircularProgress = _cgpv$ui$elements.CircularProgress;
   var elStyle = props.sx,
-    language = props.language,
     schemaValidator = props.schemaValidator,
     parentInputs = props.inputs,
     parentDatasource = props.datasource,
@@ -45123,9 +45123,9 @@ function GeoChart(props) {
     if ((inputs === null || inputs === void 0 ? void 0 : inputs.chart) === 'line') {
       // If filterings on x supported
       if (Array.isArray(xValues) && xValues.length === 2) {
-        var _inputs$geochart;
+        var _inputs$geochart, _inputs$geochart2;
         // If filtering on time values
-        if ((inputs === null || inputs === void 0 || (_inputs$geochart = inputs.geochart) === null || _inputs$geochart === void 0 || (_inputs$geochart = _inputs$geochart.xAxis) === null || _inputs$geochart === void 0 ? void 0 : _inputs$geochart.type) === 'time') {
+        if ((inputs === null || inputs === void 0 || (_inputs$geochart = inputs.geochart) === null || _inputs$geochart === void 0 || (_inputs$geochart = _inputs$geochart.xAxis) === null || _inputs$geochart === void 0 ? void 0 : _inputs$geochart.type) === 'time' || (inputs === null || inputs === void 0 || (_inputs$geochart2 = inputs.geochart) === null || _inputs$geochart2 === void 0 || (_inputs$geochart2 = _inputs$geochart2.xAxis) === null || _inputs$geochart2 === void 0 ? void 0 : _inputs$geochart2.type) === 'timeseries') {
           // Grab the filters
           var theDateFrom = new Date(xValues[0]);
           var theDateTo = new Date(xValues[1]);
@@ -45271,10 +45271,10 @@ function GeoChart(props) {
    * @param value number | number[] Indicates the slider value
    */
   var handleSliderXValueDisplay = function handleSliderXValueDisplay(value) {
-    var _inputs$geochart2;
+    var _inputs$geochart3, _inputs$geochart4;
     // If current chart has time as xAxis
-    if ((inputs === null || inputs === void 0 || (_inputs$geochart2 = inputs.geochart) === null || _inputs$geochart2 === void 0 || (_inputs$geochart2 = _inputs$geochart2.xAxis) === null || _inputs$geochart2 === void 0 ? void 0 : _inputs$geochart2.type) === 'time') {
-      return new Date(value).toLocaleDateString(language, DATE_OPTIONS_LONG);
+    if ((inputs === null || inputs === void 0 || (_inputs$geochart3 = inputs.geochart) === null || _inputs$geochart3 === void 0 || (_inputs$geochart3 = _inputs$geochart3.xAxis) === null || _inputs$geochart3 === void 0 ? void 0 : _inputs$geochart3.type) === 'time' || (inputs === null || inputs === void 0 || (_inputs$geochart4 = inputs.geochart) === null || _inputs$geochart4 === void 0 || (_inputs$geochart4 = _inputs$geochart4.xAxis) === null || _inputs$geochart4 === void 0 ? void 0 : _inputs$geochart4.type) === 'timeseries') {
+      return new Date(value).toLocaleDateString(i18n.language, DATE_OPTIONS_LONG);
     }
 
     // Default
@@ -45406,13 +45406,13 @@ function GeoChart(props) {
     // If selectedDatasource is specified
     if (selectedDatasource) {
       processAxes(inputs.geochart, selectedDatasource.items);
-      processLoadingRecords(inputs, language, selectedDatasource.items);
+      processLoadingRecords(inputs, i18n.language, selectedDatasource.items);
     }
     return function () {
       // Log
       log(LOG_LEVEL_MAXIMUM, 'USE EFFECT SELECTED DATASOURCE - UNMOUNT', selectedDatasource);
     };
-  }, [inputs, language, selectedDatasource, processLoadingRecords]);
+  }, [inputs, i18n.language, selectedDatasource, processLoadingRecords]);
 
   // Effect hook when the filtered records change - coming from this component.
   useEffect(function () {
@@ -45420,12 +45420,12 @@ function GeoChart(props) {
     log(LOG_LEVEL_MEDIUM, 'USE EFFECT SELECTED DATASOURCE FILTERED RECORDS', selectedDatasource, filteredRecords);
 
     // Process loading records
-    if (selectedDatasource) processLoadingRecords(inputs, language, filteredRecords || selectedDatasource.items);
+    if (selectedDatasource) processLoadingRecords(inputs, i18n.language, filteredRecords || selectedDatasource.items);
     return function () {
       // Log
       log(LOG_LEVEL_MAXIMUM, 'USE EFFECT SELECTED DATASOURCE FILTERED RECORDS - UNMOUNT', selectedDatasource);
     };
-  }, [inputs, language, selectedDatasource, processLoadingRecords, filteredRecords]);
+  }, [inputs, i18n.language, selectedDatasource, processLoadingRecords, filteredRecords]);
 
   // Effect hook when the main props about charttype, options and data change - coming from parent component.
   useEffect(function () {
@@ -45514,25 +45514,12 @@ function GeoChart(props) {
     };
   }, [action]);
 
-  // Effect hook to be executed when language changes
-  useEffect(function () {
-    // Log
-    log(LOG_LEVEL_MEDIUM, 'USE EFFECT CHANGE LANGUAGE');
-
-    // Change the language
-    i18n.changeLanguage(language);
-    return function () {
-      // Log
-      log(LOG_LEVEL_MAXIMUM, 'USE EFFECT CHANGE LANGUAGE - UNMOUNT');
-    };
-  }, [language, i18n]);
-
   // Effect hook to be executed with i18n
   useEffect(function () {
     // Log
     log(LOG_LEVEL_MEDIUM, 'USE EFFECT ADD_RESOURCE_BUNDLE');
 
-    // Add CZS translations file
+    // Add GeoChart translations file
     i18n.addResourceBundle('en', 'translation', translation_namespaceObject);
     i18n.addResourceBundle('fr', 'translation', fr_translation_namespaceObject);
     return function () {
@@ -45842,9 +45829,9 @@ function GeoChart(props) {
    * @returns The whole Chart container JSX.Element or an empty box
    */
   var renderChartContainerFailed = function renderChartContainerFailed() {
-    return /*#__PURE__*/(0,jsx_runtime.jsx)(Box, {
+    return /*#__PURE__*/(0,jsx_runtime.jsxs)(Box, {
       sx: sxClasses.chartError,
-      children: "Error rendering the Chart. Check console for details."
+      children: [t('geochart.parsingError'), " ", t('geochart.viewConsoleDetails')]
     });
   };
 
@@ -46047,11 +46034,17 @@ function App(props) {
   var w = window;
   // Fetch the cgpv module
   var cgpv = w.cgpv;
-  var react = cgpv.react;
+  var react = cgpv.react,
+    useTranslation = cgpv.useTranslation;
   var useEffect = react.useEffect,
     useState = react.useState,
     useCallback = react.useCallback;
   var schemaValidator = props.schemaValidator;
+
+  // Translation
+  var _useTranslation = useTranslation(),
+    t = _useTranslation.t,
+    i18n = _useTranslation.i18n;
 
   /** ****************************************** USE STATE SECTION START ************************************************ */
 
@@ -46077,16 +46070,12 @@ function App(props) {
     setAction = _ref10[1];
   var _ref11 = useState(),
     _ref12 = _slicedToArray(_ref11, 2),
-    language = _ref12[0],
-    setLanguage = _ref12[1];
+    isLoadingChart = _ref12[0],
+    setIsLoadingChart = _ref12[1];
   var _ref13 = useState(),
     _ref14 = _slicedToArray(_ref13, 2),
-    isLoadingChart = _ref14[0],
-    setIsLoadingChart = _ref14[1];
-  var _ref15 = useState(),
-    _ref16 = _slicedToArray(_ref15, 2),
-    isLoadingDatasource = _ref16[0],
-    setIsLoadingDatasource = _ref16[1];
+    isLoadingDatasource = _ref14[0],
+    setIsLoadingDatasource = _ref14[1];
 
   /** ****************************************** USE STATE SECTION END ************************************************** */
   /** *************************************** EVENT HANDLERS SECTION START ********************************************** */
@@ -46127,14 +46116,6 @@ function App(props) {
   };
 
   /**
-   * Handles when the Chart language is changed.
-   */
-  var handleChartLanguage = function handleChartLanguage(e) {
-    var ev = e;
-    setLanguage(ev.detail.language);
-  };
-
-  /**
    * Handles when the Chart has to show a loading state.
    */
   var handleChartLoading = function handleChartLoading(e) {
@@ -46147,6 +46128,14 @@ function App(props) {
 
   /** **************************************** EVENT HANDLERS SECTION END *********************************************** */
   /** ******************************************* HOOKS SECTION START *************************************************** */
+
+  /**
+   * Handles when the Chart language is changed.
+   */
+  var handleChartLanguage = useCallback(function (e) {
+    var ev = e;
+    i18n.changeLanguage(ev.detail.language);
+  }, [i18n]);
 
   /**
    * Handles when the Chart has parsed inputs.
@@ -46178,8 +46167,8 @@ function App(props) {
     // Show the error using an alert. We can't use the cgpv SnackBar as that component is attached to
     // a map and we're not even running a cgpv.init() at all here.
     // eslint-disable-next-line no-alert
-    alert("There was an error parsing the Chart inputs.\n\n".concat(msgAll, "\n\nView console for details."));
-  }, []); // Crazy typing, because can't use the generic version of 'useCallback'
+    alert("".concat(t('geochart.parsingError'), "\n\n").concat(msgAll, "\n\n").concat(t('geochart.viewConsoleDetails')));
+  }, [t]); // Crazy typing, because can't use the generic version of 'useCallback'
 
   // Effect hook to add and remove event listeners.
   // Using window.addEventListener is unconventional here, but this is strictly for the 'app' logic with the index.html.
@@ -46195,7 +46184,7 @@ function App(props) {
       window.removeEventListener('chart/language', handleChartLanguage);
       window.removeEventListener('chart/isLoading', handleChartLoading);
     };
-  }, []);
+  }, [handleChartLanguage]);
 
   /** ********************************************* HOOKS SECTION END *************************************************** */
   /** ******************************************** RENDER SECTION START ************************************************* */
@@ -46203,7 +46192,6 @@ function App(props) {
   // Render the Chart
   return /*#__PURE__*/(0,jsx_runtime.jsx)(GeoChart, {
     inputs: inputs,
-    language: language,
     schemaValidator: schemaValidator,
     chart: chart,
     data: data,
