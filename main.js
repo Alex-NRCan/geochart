@@ -50799,11 +50799,6 @@ instance.use(initReactI18next)
     fr: {
       translation: fr_translation_namespaceObject
     }
-  },
-  // special options for react-i18next
-  // learn more: https://react.i18next.com/components/i18next-instance
-  react: {
-    useSuspense: true
   }
 });
 /* harmony default export */ const src_i18n = ((/* unused pure expression or super */ null && (i18n)));
