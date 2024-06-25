@@ -34,6 +34,8 @@ export interface TypeChartChartProps<
   TData extends GeoDefaultDataPoint<TType> = GeoDefaultDataPoint<TType>,
   TLabel = string
 > {
+  //container element
+  container?: HTMLElement,
   // The schemas validator object
   schemaValidator: SchemaValidator;
 
@@ -145,6 +147,7 @@ export function GeoChart<
   } = cgpv.ui.elements;
   const {
     sx: elStyle,
+    container: containerElement,
     schemaValidator,
     inputs: parentInputs,
     datasource: parentDatasource,
@@ -1556,6 +1559,7 @@ export function GeoChart<
       return (
         <Box>
           <Select
+            container={containerElement}
             sx={sxClasses.datasourceSelector}
             label={t('geochart.feature')}
             onChange={handleDatasourceChanged}
@@ -1593,6 +1597,7 @@ export function GeoChart<
 
       return (
         <Select
+          container={containerElement}
           sx={sxClasses.uiOptionsStepsSelector}
           label={t('geochart.steps')}
           onChange={handleStepsSwitcherChanged}
