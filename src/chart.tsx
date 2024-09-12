@@ -1805,7 +1805,7 @@ export function GeoChart<
     return (
       <Paper sx={{ ...sx, ...sxClasses.mainGeoChartContainer }}>
         <Grid container sx={{ m: '20px' }}>
-          <Grid item xs={12}>
+          <Grid item sm={12}>
             <Box sx={sxClasses.header}>
               {renderDatasourceSelector()}
               {renderUIOptions()}
