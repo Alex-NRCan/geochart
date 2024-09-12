@@ -48617,7 +48617,7 @@ function GeoChart(props) {
         },
         children: [/*#__PURE__*/(0,jsx_runtime.jsxs)(Grid, {
           item: true,
-          xs: 12,
+          sm: 12,
           children: [/*#__PURE__*/(0,jsx_runtime.jsxs)(Box, {
             sx: sxClasses.header,
             children: [renderDatasourceSelector(), renderUIOptions(), renderDownload()]
