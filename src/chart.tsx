@@ -1105,10 +1105,26 @@ export function GeoChart<
     logger.logTraceUseEffect(USE_EFFECT_FUNC, chartOptions, chartData);
 
     // If chart options. Validate the parsing we did do follow ChartJS options schema validating
-    if (chartOptions) setValidatorOptions(schemaValidator.validateOptions(chartOptions));
+    if (chartOptions) {
+      // Validate the options inputs
+      var validRes = schemaValidator.validateOptions(chartOptions)
+      if (!validRes.valid) {
+        // Log
+        logger.logError('Failed when validating data options for Chart', validRes);
+      }
+      setValidatorOptions(validRes);
+    }
 
     // If chart data. Validate the parsing we did do follow ChartJS data schema validating
-    if (chartData) setValidatorData(schemaValidator.validateData(chartData));
+    if (chartData) {
+      // Validate the data inputs
+      var validRes = schemaValidator.validateData(chartData);
+      if (!validRes.valid) {
+        // Log
+        logger.logError('Failed when validating data inputs for Chart', validRes);
+      }
+      setValidatorData(validRes);
+    }
 
     return () => {
       // Log
