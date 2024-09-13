@@ -1105,10 +1105,26 @@ export function GeoChart<
     logger.logTraceUseEffect(USE_EFFECT_FUNC, chartOptions, chartData);
 
     // If chart options. Validate the parsing we did do follow ChartJS options schema validating
-    if (chartOptions) setValidatorOptions(schemaValidator.validateOptions(chartOptions));
+    if (chartOptions) {
+      // Validate the options inputs
+      var validRes = schemaValidator.validateOptions(chartOptions)
+      if (!validRes.valid) {
+        // Log
+        logger.logError('Failed when validating data options for Chart', validRes);
+      }
+      setValidatorOptions(validRes);
+    }
 
     // If chart data. Validate the parsing we did do follow ChartJS data schema validating
-    if (chartData) setValidatorData(schemaValidator.validateData(chartData));
+    if (chartData) {
+      // Validate the data inputs
+      var validRes = schemaValidator.validateData(chartData);
+      if (!validRes.valid) {
+        // Log
+        logger.logError('Failed when validating data inputs for Chart', validRes);
+      }
+      setValidatorData(validRes);
+    }
 
     return () => {
       // Log
@@ -1789,7 +1805,7 @@ export function GeoChart<
     return (
       <Paper sx={{ ...sx, ...sxClasses.mainGeoChartContainer }}>
         <Grid container sx={{ m: '20px' }}>
-          <Grid item xs={12}>
+          <Grid item size={{xs: 12}}>
             <Box sx={sxClasses.header}>
               {renderDatasourceSelector()}
               {renderUIOptions()}
@@ -1802,25 +1818,25 @@ export function GeoChart<
             </Box>
           </Grid>
 
-          <Grid item xs={1}>
+          <Grid item size={{xs: 1}}>
             {renderYAxisLabel()}
           </Grid>
-          <Grid item sx={sxClasses.chartContent} xs={10}>
+          <Grid item sx={sxClasses.chartContent} size={{xs: 10}}>
             {isLoadingDatasource && <CircularProgress sx={sxClasses.loadingDatasource} />}
             {renderChart()}
           </Grid>
-          <Grid item xs={1}>
+          <Grid item size={{xs: 1}}>
             {renderYSlider()}
           </Grid>
 
-          <Grid item xs={1.25} />
-          <Grid item xs={9.75}>
+          <Grid item size={{xs: 1.25}} />
+          <Grid item size={{xs: 9.75}}>
             {renderXAxisLabel()}
             {renderXSlider()}
           </Grid>
-          <Grid item xs={1} />
+          <Grid item size={{xs: 1}} />
 
-          <Grid item xs={12}>
+          <Grid item size={{xs: 12}}>
             {renderDescription()}
           </Grid>
         </Grid>
