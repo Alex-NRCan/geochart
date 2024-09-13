@@ -48617,7 +48617,9 @@ function GeoChart(props) {
         },
         children: [/*#__PURE__*/(0,jsx_runtime.jsxs)(Grid, {
           item: true,
-          sm: 12,
+          size: {
+            xs: 12
+          },
           children: [/*#__PURE__*/(0,jsx_runtime.jsxs)(Box, {
             sx: sxClasses.header,
             children: [renderDatasourceSelector(), renderUIOptions(), renderDownload()]
@@ -48630,32 +48632,46 @@ function GeoChart(props) {
           })]
         }), /*#__PURE__*/(0,jsx_runtime.jsx)(Grid, {
           item: true,
-          xs: 1,
+          size: {
+            xs: 1
+          },
           children: renderYAxisLabel()
         }), /*#__PURE__*/(0,jsx_runtime.jsxs)(Grid, {
           item: true,
           sx: sxClasses.chartContent,
-          xs: 10,
+          size: {
+            xs: 10
+          },
           children: [isLoadingDatasource && /*#__PURE__*/(0,jsx_runtime.jsx)(CircularProgress, {
             sx: sxClasses.loadingDatasource
           }), renderChart()]
         }), /*#__PURE__*/(0,jsx_runtime.jsx)(Grid, {
           item: true,
-          xs: 1,
+          size: {
+            xs: 1
+          },
           children: renderYSlider()
         }), /*#__PURE__*/(0,jsx_runtime.jsx)(Grid, {
           item: true,
-          xs: 1.25
+          size: {
+            xs: 1.25
+          }
         }), /*#__PURE__*/(0,jsx_runtime.jsxs)(Grid, {
           item: true,
-          xs: 9.75,
+          size: {
+            xs: 9.75
+          },
           children: [renderXAxisLabel(), renderXSlider()]
         }), /*#__PURE__*/(0,jsx_runtime.jsx)(Grid, {
           item: true,
-          xs: 1
+          size: {
+            xs: 1
+          }
         }), /*#__PURE__*/(0,jsx_runtime.jsx)(Grid, {
           item: true,
-          xs: 12,
+          size: {
+            xs: 12
+          },
           children: renderDescription()
         })]
       })
