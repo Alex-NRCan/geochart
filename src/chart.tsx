@@ -1805,7 +1805,7 @@ export function GeoChart<
     return (
       <Paper sx={{ ...sx, ...sxClasses.mainGeoChartContainer }}>
         <Grid container sx={{ m: '20px' }}>
-          <Grid item sm={12}>
+          <Grid item size={{xs: 12}}>
             <Box sx={sxClasses.header}>
               {renderDatasourceSelector()}
               {renderUIOptions()}
@@ -1818,25 +1818,25 @@ export function GeoChart<
             </Box>
           </Grid>
 
-          <Grid item xs={1}>
+          <Grid item size={{xs: 1}}>
             {renderYAxisLabel()}
           </Grid>
-          <Grid item sx={sxClasses.chartContent} xs={10}>
+          <Grid item sx={sxClasses.chartContent} size={{xs: 10}}>
             {isLoadingDatasource && <CircularProgress sx={sxClasses.loadingDatasource} />}
             {renderChart()}
           </Grid>
-          <Grid item xs={1}>
+          <Grid item size={{xs: 1}}>
             {renderYSlider()}
           </Grid>
 
-          <Grid item xs={1.25} />
-          <Grid item xs={9.75}>
+          <Grid item size={{xs: 1.25}} />
+          <Grid item size={{xs: 9.75}}>
             {renderXAxisLabel()}
             {renderXSlider()}
           </Grid>
-          <Grid item xs={1} />
+          <Grid item size={{xs: 1}} />
 
-          <Grid item xs={12}>
+          <Grid item size={{xs: 12}}>
             {renderDescription()}
           </Grid>
         </Grid>
