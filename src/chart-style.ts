@@ -114,6 +114,9 @@ export const getSxClasses = (theme: Theme) => {
       '& .MuiSlider-root': {
         color: theme.palette.geoViewColor?.primary.main,
       },
+      '& .MuiSlider-thumb:hover, .MuiSlider-thumb.Mui-focusVisible': {
+        boxShadow: 'rgba(255, 0, 0, 0.80) 0px 0px 0px 3px !important',
+      },
       '& .MuiSlider-markLabel-overlap': {
         marginTop: '20px',
       },
@@ -147,6 +150,9 @@ export const getSxClasses = (theme: Theme) => {
       marginLeft: '20px',
       '& .MuiSlider-root': {
         color: theme.palette.geoViewColor?.primary.main,
+      },
+      '&  .MuiSlider-thumb:hover, .MuiSlider-thumb.Mui-focusVisible': {
+        boxShadow: 'rgba(255, 0, 0, 0.80) 0px 0px 0px 3px !important',
       },
       '& .markLabel-top, & .markLabel-bottom': {
         fontFamily: theme.typography.body1.fontFamily,

@@ -613,7 +613,8 @@ export function createChartJSOptions<TType extends ChartType>(
   chartConfig: GeoChartConfig<TType>,
   defaultOptions: ChartOptions<TType>,
   yAxisType: ScalePossibilities,
-  language: string
+  language: string,
+  records: TypeJsonObject[] | undefined
 ): ChartOptions<TType> {
   // The Chart JS Options as entered or the default options
   const options = {
@@ -624,6 +625,11 @@ export function createChartJSOptions<TType extends ChartType>(
 
   // If line and using a time series
   if (chartConfig.chart === 'line' && (chartConfig.geochart.xAxis?.type === 'time' || chartConfig.geochart.xAxis?.type === 'timeseries')) {
+    // Try to prevent too many ticks vs the actual number of records in the dynamic range (when 20 ticks might be too many)
+    // Still not ideal, not sure how to make it better and keep performance in check...
+    // const maxTicksLimit = Math.min(20, records?.length || 20);
+
+    // Generate the options object
     const optionsLine = options as ChartOptions<'line'>;
     optionsLine.scales = {
       ...optionsLine.scales,

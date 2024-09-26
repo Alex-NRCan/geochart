@@ -266,8 +266,9 @@ export function GeoChart<
 
   /**
    * Helper function to set the x and y axes based on the inputs and values.
-   * @param geochart GeoChartOptionsGeochart The Geochart options
-   * @param datasourceItems TypeJsonObject[] The Datasource items
+   * @param {GeoChartOptionsGeochart} geochart The Geochart options
+   * @param {GeoChartOptionsUI | undefined} uiOptions The Geochart options
+   * @param {TypeJsonObject[]} datasourceItems The Datasource items
    */
   const processAxes = (
     geochart: GeoChartOptionsGeochart,
@@ -297,7 +298,15 @@ export function GeoChart<
         setXSliderMax(xMaxVal);
 
         // If steps are determined by config
-        if (uiOptions?.xSlider!.step) setXSliderSteps(uiOptions?.xSlider!.step);
+        if (uiOptions?.xSlider!.step) {
+          setXSliderSteps(uiOptions?.xSlider!.step);
+        } else {
+          // If date axis
+          if (geochart.xAxis.type === 'time' || geochart.xAxis.type === 'timeseries') {
+            // Default to 1 day per step
+            setXSliderSteps(86400000); // 24h x 60m x 60s x 1000ms = 86,400,000
+          }
+        }
       }
     }
 
@@ -320,7 +329,9 @@ export function GeoChart<
         setYSliderMax(yMaxVal);
 
         // If steps are determined by config
-        if (uiOptions?.ySlider!.step) setYSliderSteps(uiOptions?.ySlider!.step);
+        if (uiOptions?.ySlider!.step) {
+          setYSliderSteps(uiOptions?.ySlider!.step);
+        }
       }
     }
 
@@ -621,7 +632,7 @@ export function GeoChart<
   const updateDataVisibilityUsingState = useCallback(
     (theChartRef: ChartJS<TType, TData, TLabel>, theDatasRegistry: GeoChartSelectedDataset): void => {
       // Log
-      logger.logTraceUseCallback('GEOCHART - processLoadingRecords', theChartRef, theDatasRegistry);
+      logger.logTraceUseCallback('GEOCHART - updateDataVisibilityUsingState', theChartRef, theDatasRegistry);
 
       // Check
       if (!theChartRef) return;
@@ -666,7 +677,7 @@ export function GeoChart<
       logger.logTraceUseCallback('GEOCHART - processLoadingRecords', theInputs, theDatasetRegistry, theDatasRegistry, theLanguage);
 
       // Parse the data
-      const parsedOptions = createChartJSOptions<TType>(theInputs, parentOptions!, theYScale, theLanguage);
+      const parsedOptions = createChartJSOptions<TType>(theInputs, parentOptions!, theYScale, theLanguage, records);
       const parsedData = createChartJSData<TType, TData, TLabel>(
         theInputs,
         theDatasetRegistry,
@@ -1234,8 +1245,8 @@ export function GeoChart<
 
   /**
    * Handles when the Datasource changes
-   * @param e Event The Select change event
-   * @param item MenuItem The selected MenuItem
+   * @param {Event} e The Select change event
+   * @param {MenuItem} item The selected MenuItem
    */
   const handleDatasourceChanged = async (e: Event, item: typeof MenuItem): Promise<void> => {
     // Find the selected datasource reference based on the MenuItem
@@ -1258,9 +1269,9 @@ export function GeoChart<
 
   /**
    * Handles when a dataset was checked/unchecked (via the legend)
-   * @param datasetIndex number Indicates the dataset index that was checked/unchecked
-   * @param datasetLabel string | undefined Indicates the dataset label that was checked/unchecked
-   * @param checked boolean Indicates the checked state
+   * @param {number} datasetIndex - Indicates the dataset index that was checked/unchecked
+   * @param {string | undefined} datasetLabel - Indicates the dataset label that was checked/unchecked
+   * @param {boolean} checked - Indicates the checked state
    */
   const handleDatasetChecked = (datasetIndex: number, datasetLabel: string | undefined, checked: boolean): void => {
     // Keep track
@@ -1275,9 +1286,9 @@ export function GeoChart<
 
   /**
    * Handles when a data was checked/unchecked (via the legend). This is only used by Pie and Doughnut Charts.
-   * @param dataIndex number Indicates the data index that was checked/unchecked
-   * @param dataLabel string Indicates the data label that was checked/unchecked
-   * @param checked boolean Indicates the checked state
+   * @param {number} dataIndex - Indicates the data index that was checked/unchecked
+   * @param {string} dataLabel - Indicates the data label that was checked/unchecked
+   * @param {boolean} checked - Indicates the checked state
    */
   const handleDataChecked = (dataIndex: number, dataLabel: string, checked: boolean): void => {
     // Keep track
@@ -1292,7 +1303,7 @@ export function GeoChart<
 
   /**
    * Handles when the X Slider changes
-   * @param value number | number[] Indicates the slider value
+   * @param {number | number[]} value - Indicates the slider value
    */
   const handleSliderXChange = (newValue: number | number[]): void => {
     // Set the X State
@@ -1304,7 +1315,7 @@ export function GeoChart<
 
   /**
    * Handles when the Y Slider changes
-   * @param value number | number[] Indicates the slider value
+   * @param {number | number[]} newValue - Indicates the slider value
    */
   const handleSliderYChange = (newValue: number | number[]): void => {
     // Set the Y State
@@ -1316,7 +1327,8 @@ export function GeoChart<
 
   /**
    * Handles when the Steps Switcher changes
-   * @param value string Indicates the steps value
+   * @param {unknown} e
+   * @param {MenuItem} item
    */
   const handleStepsSwitcherChanged = (e: unknown, item: typeof MenuItem): void => {
     // Set the step switcher
@@ -1328,7 +1340,8 @@ export function GeoChart<
 
   /**
    * Handles when the Scale Switcher changes
-   * @param value string Indicates the scale type value
+   * @param {unknown} e
+   * @param {MenuItem} item
    */
   const handleScaleSwitcherChanged = (e: unknown, item: typeof MenuItem): void => {
     // Set the scale switcher
@@ -1365,7 +1378,7 @@ export function GeoChart<
 
   /**
    * Handles the display of the label on the X Slider
-   * @param value number | number[] Indicates the slider value
+   * @param {number} value - Indicates the slider value
    */
   const handleSliderXValueDisplay = (value: number): string => {
     // Callback in case we're overriding this behavior
@@ -1384,7 +1397,7 @@ export function GeoChart<
 
   /**
    * Handles the display of the label on the Y Slider
-   * @param value number | number[] Indicates the slider value
+   * @param {number} value - Indicates the slider value
    */
   const handleSliderYValueDisplay = (value: number): string => {
     // Callback in case we're overriding this behavior
@@ -1397,7 +1410,7 @@ export function GeoChart<
 
   /**
    * Handles when the download button is clicked
-   * @param index number Indicates the button drop down selection index when it was clicked.
+   * @param {number} index - Indicates the button drop down selection index when it was clicked.
    * For our button usage:
    * - 0: Means 'download view' was selected when button was clicked
    * - 1: Means 'download all' was selected when button was clicked
@@ -1508,7 +1521,7 @@ export function GeoChart<
     if (inputs && selectedDatasource) {
       if (inputs.chart === 'line' && inputs.ui?.xSlider?.display) {
         return (
-          <Box id="xAxisSlider" sx={sxClasses.xSliderWrapper}>
+          <Box sx={sxClasses.xSliderWrapper}>
             <div style={{ height: '16px' }}>
               {Array.isArray(xSliderValues) && xSliderValues[0] !== xSliderMin && (
                 <span className="markLabel-first">{handleSliderXValueDisplay(xSliderMin)}</span>
