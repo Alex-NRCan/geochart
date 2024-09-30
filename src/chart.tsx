@@ -22,8 +22,8 @@ import {
 } from './types';
 import { SchemaValidator, ValidatorResult } from './chart-schema-validator';
 import { createChartJSOptions, createChartJSData, fetchItemsViaQueryForDatasource, setColorPalettes } from './chart-parsing';
-import { isNumber, downloadJson, getColorFromPalette } from './utils';
 import { getSxClasses } from './chart-style';
+import { isNumber, downloadJson, getColorFromPalette, guessEstimatedStep } from './utils';
 
 /**
  * Main props for the Chart.
@@ -221,11 +221,11 @@ export function GeoChart<
   const [filteredRecords, setFilteredRecords] = useState() as [TypeJsonObject[] | undefined, React.Dispatch<TypeJsonObject[] | undefined>];
   const [xSliderMin, setXSliderMin] = useState(0) as [number, React.Dispatch<number>];
   const [xSliderMax, setXSliderMax] = useState(0) as [number, React.Dispatch<number>];
-  const [xSliderSteps, setXSliderSteps] = useState(1) as [number, React.Dispatch<number>];
+  const [xSliderSteps, setXSliderSteps] = useState() as [number | undefined, React.Dispatch<number | undefined>];
   const [xSliderValues, setXSliderValues] = useState() as [number | number[], React.Dispatch<number | number[]>];
   const [ySliderMin, setYSliderMin] = useState(0) as [number, React.Dispatch<number>];
   const [ySliderMax, setYSliderMax] = useState(0) as [number, React.Dispatch<number>];
-  const [ySliderSteps, setYSliderSteps] = useState(1) as [number, React.Dispatch<number>];
+  const [ySliderSteps, setYSliderSteps] = useState() as [number | undefined, React.Dispatch<number | undefined>];
   const [ySliderValues, setYSliderValues] = useState() as [number | number[], React.Dispatch<number | number[]>];
   const [validatorInputs, setValidatorInputs] = useState() as [ValidatorResult | undefined, React.Dispatch<ValidatorResult | undefined>];
   const [validatorOptions, setValidatorOptions] = useState() as [ValidatorResult | undefined, React.Dispatch<ValidatorResult | undefined>];
@@ -303,8 +303,8 @@ export function GeoChart<
         } else {
           // If date axis
           if (geochart.xAxis.type === 'time' || geochart.xAxis.type === 'timeseries') {
-            // Default to 1 day per step
-            setXSliderSteps(86400000); // 24h x 60m x 60s x 1000ms = 86,400,000
+            // Get an estimated stepping value
+            setXSliderSteps(guessEstimatedStep(xMinVal, xMaxVal));
           }
         }
       }
@@ -340,12 +340,12 @@ export function GeoChart<
 
   /**
    * Helper function to set the x and y axes values based on the min and max of the data or if the values were already set in state.
-   * @param xMinVal number | undefined
-   * @param xMaxVal number | undefined
-   * @param yMinVal number | undefined
-   * @param yMaxVal number | undefined
-   * @param theXSliderValues number[] | undefinedd
-   * @param theYSliderValues number[] | undefined
+   * @param {number | undefined} xMinVal - The min value for X
+   * @param {number | undefined} xMaxVal - The max value for X
+   * @param {number | undefined} yMinVal - The min value for Y
+   * @param {number | undefined} yMaxVal - The max value for Y
+   * @param {number[] | undefined} theXSliderValues - The slider values for X
+   * @param {number[] | undefined} theYSliderValues - The slider values for Y
    */
   const processAxesValues = (
     uiOptions: GeoChartOptionsUI | undefined,
@@ -386,8 +386,10 @@ export function GeoChart<
 
   /**
    * Fetches the items to associated to the given Datasource and then sets the Datasource in GeoChart
-   * @param chartConfig GeoViewGeoChartConfig The chart configuration being used
-   * @param ds GeoChartDatasource The Datasource to fetch the items for
+   * @param {GeoViewGeoChartConfig} chartQuery - The chart query being used
+   * @param {string} theLanguage - The language being used
+   * @param {TypeJsonObject | undefined} sourceItem - The source item to fetch for
+   * @param {Function} errorCallback - Callback called when an error happens while fetching data
    */
   const fetchDatasourceItems = async (
     chartQuery: GeoChartQuery,
@@ -413,7 +415,7 @@ export function GeoChart<
 
   /**
    * Helper function checking for the valid states of a list of ValidatorResults. Returns true if there were no errors found.
-   * @param validators (ValidatorResult | undefined)[] The list of validator results to check for their valid states
+   * @param {(ValidatorResult | undefined)[]} validators - The list of validator results to check for their valid states
    * @returns true if there were no errors in the schema validations
    */
   const hasValidSchemas = (validators: (ValidatorResult | undefined)[]): boolean => {
@@ -442,7 +444,10 @@ export function GeoChart<
 
   /**
    * Updates the selected datasets object in synch with the actual datasets read from the data.
-   * @param theChartData ChartData<TType, TData, TLabel>
+   * @param {TypeJsonObject[] | undefined} items - The items reprensenting the data
+   * @param {string | undefined} catPropertyName - The property name for the categorization
+   * @param {string[] | undefined} paletteBackgrounds - The color palette used for the background colors
+   * @param {string[] | undefined} paletteBorders - The color palette used for the border colors
    */
   const processDatasets = useCallback(
     (
@@ -517,7 +522,11 @@ export function GeoChart<
 
   /**
    * Updates the selected data object in synch with the actual labels read from the data.
-   * @param theChartData ChartData<TType, TData, TLabel>
+   * @param {string} theChartType - The chart type
+   * @param {TypeJsonObject[] | undefined} items - The items to process the labels for
+   * @param {string | undefined} labelPropertyName - The property name to use for labeling
+   * @param {string[] | undefined} paletteBackgrounds - The color palette used for the background colors
+   * @param {string[] | undefined} paletteBorders - The color palette used for the border colors
    */
   const processLabels = useCallback(
     (
@@ -597,8 +606,8 @@ export function GeoChart<
 
   /**
    * Updates the chart dataset visibility based on the currently selected datasets.
-   * @param theChartData ChartData<TType, TData, TLabel>
-   * @param theSelectedDatasets GeoChartSelectedDatasets
+   * @param {ChartJS<TType, TData, TLabel>} theChartRef - The ChartJS reference
+   * @param {GeoChartSelectedDataset} theDatasetRegistry - The dataset registry used by the chart
    */
   const updateDatasetVisibilityUsingState = useCallback(
     (theChartRef: ChartJS<TType, TData, TLabel>, theDatasetRegistry: GeoChartSelectedDataset): void => {
@@ -626,8 +635,8 @@ export function GeoChart<
 
   /**
    * Updates the chart data visibility based on the currently selected data.
-   * @param theChartData ChartData<TType, TData, TLabel>
-   * @param theSelectedData GeoChartSelectedDatasets
+   * @param {ChartJS<TType, TData, TLabel>} theChartRef - The ChartJS reference
+   * @param {GeoChartSelectedDataset} theDatasRegistry - The datas registry used by the chart
    */
   const updateDataVisibilityUsingState = useCallback(
     (theChartRef: ChartJS<TType, TData, TLabel>, theDatasRegistry: GeoChartSelectedDataset): void => {
@@ -660,8 +669,13 @@ export function GeoChart<
 
   /**
    * Essential function to load the records in the Chart.
-   * @param datasource GeoChartDatasource The Datasource on which the records were grabbed
-   * @param records TypeJsonObject[] The actual records to load in the Chart.
+   * @param {GeoChartConfig<TType>} theInputs - The inputs configuration
+   * @param {GeoChartSelectedDataset} theDatasetRegistry - The dataset registry
+   * @param {GeoChartSelectedDataset} theDatasRegistry - The datas registry
+   * @param {string} theLanguage - The language
+   * @param {StepsPossibilities} theSteps - The steps for the graph
+   * @param {ScalePossibilities} theYScale - The scale for the Y axis
+   * @param {TypeJsonObject[] | undefined} records - The records
    */
   const processLoadingRecords = useCallback(
     (
@@ -677,7 +691,7 @@ export function GeoChart<
       logger.logTraceUseCallback('GEOCHART - processLoadingRecords', theInputs, theDatasetRegistry, theDatasRegistry, theLanguage);
 
       // Parse the data
-      const parsedOptions = createChartJSOptions<TType>(theInputs, parentOptions!, theYScale, theLanguage, records);
+      const parsedOptions = createChartJSOptions<TType>(theInputs, parentOptions!, theYScale, theLanguage);
       const parsedData = createChartJSData<TType, TData, TLabel>(
         theInputs,
         theDatasetRegistry,
@@ -715,9 +729,15 @@ export function GeoChart<
   /**
    * Helper function to filter datasource items based on 2 possible and independent axis.
    * For performance reasons, the code cumulates the filtered data instead of treating the axes individually.
-   * @param datasourceItems TypeJsonObject[] The Datasource items
-   * @param xValues number | number[] The values in X to filter on
-   * @param yValues number | number[] The values in Y to filter on
+   * @param {GeoChartConfig<TType>} theInputs - The inputs configuration
+   * @param {GeoChartSelectedDataset} theDatasetRegistry - The dataset registry
+   * @param {GeoChartSelectedDataset} theDatasRegistry - The datas registry
+   * @param {string} theLanguage - The language
+   * @param {StepsPossibilities} theSteps - The steps for the graph
+   * @param {ScalePossibilities} theYScale - The scale for the Y axis
+   * @param {TypeJsonObject[] | undefined} records - The records
+   * @param {number | number[]} xValues - The X axis filtering values
+   * @param {number | number[]} yValues - The Y axis filtering values
    */
   const processLoadingRecordsFilteringFirst = useCallback(
     (
@@ -1380,7 +1400,7 @@ export function GeoChart<
    * Handles the display of the label on the X Slider
    * @param {number} value - Indicates the slider value
    */
-  const handleSliderXValueDisplay = (value: number): string => {
+  const handleSliderXValueFormat = (value: number): string => {
     // Callback in case we're overriding this behavior
     const val = onSliderXValueDisplaying?.(value);
     if (val) return val;
@@ -1399,7 +1419,7 @@ export function GeoChart<
    * Handles the display of the label on the Y Slider
    * @param {number} value - Indicates the slider value
    */
-  const handleSliderYValueDisplay = (value: number): string => {
+  const handleSliderYValueFormat = (value: number): string => {
     // Callback in case we're overriding this behavior
     const val = onSliderYValueDisplaying?.(value);
     if (val) return val;
@@ -1510,7 +1530,10 @@ export function GeoChart<
       }
     }
     return sliderMarks;
-  }, []);
+  }, []) as (
+    sliderValues: number | number[],
+    handleSliderValueDisplay: (value: number) => string
+  ) => void;
 
   /**
    * Renders the X Chart Slider JSX.Element or an empty box
@@ -1522,23 +1545,15 @@ export function GeoChart<
       if (inputs.chart === 'line' && inputs.ui?.xSlider?.display) {
         return (
           <Box sx={sxClasses.xSliderWrapper}>
-            <div style={{ height: '16px' }}>
-              {Array.isArray(xSliderValues) && xSliderValues[0] !== xSliderMin && (
-                <span className="markLabel-first">{handleSliderXValueDisplay(xSliderMin)}</span>
-              )}
-              {Array.isArray(xSliderValues) && xSliderValues[xSliderValues.length - 1] !== xSliderMax && (
-                <span className="markLabel-last">{handleSliderXValueDisplay(xSliderMax)}</span>
-              )}
-            </div>
             <Slider
-              marks={getMarkers(xSliderValues, handleSliderXValueDisplay)}
+              marks={getMarkers([xSliderMin, xSliderMax], handleSliderXValueFormat)}
               min={xSliderMin}
               max={xSliderMax}
               step={xSliderSteps}
               value={xSliderValues || 0}
               onChangeCommitted={handleSliderXChange}
-              onValueDisplay={handleSliderXValueDisplay}
-              onValueDisplayAriaLabel={handleSliderXValueDisplay}
+              onValueLabelFormat={handleSliderXValueFormat}
+              onValueDisplayAriaLabel={handleSliderXValueFormat}
             />
           </Box>
         );
@@ -1559,27 +1574,17 @@ export function GeoChart<
       if (inputs.chart === 'line' && inputs.ui?.ySlider?.display) {
         return (
           <Box sx={sxClasses.ySliderWrapper}>
-            <div style={{ height: '16px', marginBottom: '10px' }}>
-              {Array.isArray(ySliderValues) && ySliderValues[ySliderValues.length - 1] !== ySliderMax && (
-                <span className="markLabel-top">{handleSliderYValueDisplay(ySliderMax)}</span>
-              )}
-            </div>
             <Slider
-              marks={getMarkers(ySliderValues, handleSliderYValueDisplay)}
+              marks={getMarkers([ySliderMin, ySliderMax], handleSliderYValueFormat)}
               min={ySliderMin}
               max={ySliderMax}
               step={ySliderSteps}
               value={ySliderValues || 0}
               orientation="vertical"
               onChangeCommitted={handleSliderYChange}
-              onValueDisplay={handleSliderYValueDisplay}
-              onValueDisplayAriaLabel={handleSliderYValueDisplay}
+              onValueLabelFormat={handleSliderYValueFormat}
+              onValueDisplayAriaLabel={handleSliderYValueFormat}
             />
-            <div style={{ height: '16px' }}>
-              {Array.isArray(ySliderValues) && ySliderValues[0] !== ySliderMin && (
-                <span className="markLabel-bottom">{handleSliderYValueDisplay(ySliderMin)}</span>
-              )}
-            </div>
           </Box>
         );
       }
