@@ -1551,8 +1551,6 @@ export function GeoChart<
               max={xSliderMax}
               step={xSliderSteps}
               value={xSliderValues || 0}
-              disableSwap
-              labelSpread
               onChangeCommitted={handleSliderXChange}
               onValueLabelFormat={handleSliderXValueFormat}
               onValueDisplayAriaLabel={handleSliderXValueFormat}
