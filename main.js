@@ -45002,10 +45002,10 @@ var downloadJson = function downloadJson(data, filename) {
 var guessEstimatedStep = function guessEstimatedStep(minValue, maxValue) {
   var day1 = 86400000; // 24h x 60m x 60s x 1000ms = 86,400,000ms in a day
   var month1 = day1 * 30; // 2,592,000,000ms in 1 month
+  var months2 = month1 * 2; // 5,184,000,000ms in 2 months
   var year1 = day1 * 365; // 31,536,000,000ms in 1 year
   var years2 = year1 * 2; // 63,072,000,000ms in 2 years
-  var years10 = year1 * 10; // 63,072,000,000ms in 2 years
-  var months2 = month1 * 2; // 315,360,000,000 in 10 years
+  var years10 = year1 * 10; // 315,360,000,000 in 10 years
   var intervalDiff = maxValue - minValue;
   var step;
   if (intervalDiff > months2) step = day1; // Daily stepping
@@ -45374,6 +45374,7 @@ _defineProperty(SchemaValidator, "parseValidatorResultMessage", function (valRes
 
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+
 
 
 
@@ -45810,7 +45811,7 @@ function createDatasetsLineBar(chartConfig, datasetsRegistry, steps, records) {
   } else {
     // 1 feature = 1 dataset
     // Create dataset
-    var newDataset = createDataset(chartConfig, undefined, undefined, steps, undefined);
+    var newDataset = createDataset(chartConfig, Chart.defaults.color, undefined, steps, undefined);
     returnedChartData.datasets.push(newDataset);
 
     // For each record
@@ -45871,7 +45872,7 @@ function createDatasetsPieDoughnut(chartConfig, datasetsRegistry, datasRegistry,
         // If new category
         if (!Object.keys(categoriesRead).includes(catName)) {
           // Create dataset
-          var newDataset = createDataset(chartConfig, paletteBackgroundAll, undefined, undefined, catName);
+          var newDataset = createDataset(chartConfig, paletteBackgroundAll, Chart.defaults.color, undefined, catName);
           categoriesRead[catName] = {
             index: idx++,
             data: newDataset.data
@@ -45896,7 +45897,7 @@ function createDatasetsPieDoughnut(chartConfig, datasetsRegistry, datasRegistry,
     var _newDataset$data;
     // 1 feature = 1 dataset
     // Create dataset
-    var newDataset = createDataset(chartConfig, undefined, undefined, undefined, undefined);
+    var newDataset = createDataset(chartConfig, Chart.defaults.color, undefined, undefined, undefined);
     returnedChartData.datasets.push(newDataset);
 
     // Compress the data for the ChartDataset
@@ -46105,7 +46106,7 @@ function createChartJSData(chartConfig, datasetsRegistry, datasRegistry, steps, 
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 var getSxClasses = function getSxClasses(theme) {
-  var _theme$palette$geoVie, _theme$palette$geoVie2, _theme$palette$geoVie3, _theme$palette$geoVie4, _theme$palette$geoVie5, _theme$palette$geoVie6, _theme$palette$geoVie7, _theme$palette$geoVie8, _theme$palette$geoVie9, _theme$palette$geoVie10;
+  var _theme$palette$geoVie, _theme$palette$geoVie2, _theme$palette$geoVie3, _theme$palette$geoVie4, _theme$palette$geoVie5, _theme$palette$geoVie6;
   return {
     mainContainer: {
       fontFamily: theme.typography.body1.fontFamily
@@ -46147,13 +46148,7 @@ var getSxClasses = function getSxClasses(theme) {
       marginLeft: 'auto',
       '& button': {
         height: '40px',
-        textTransform: 'capitalize',
-        backgroundColor: (_theme$palette$geoVie2 = theme.palette.geoViewColor) === null || _theme$palette$geoVie2 === void 0 ? void 0 : _theme$palette$geoVie2.bgColor.dark[100],
-        color: (_theme$palette$geoVie3 = theme.palette.geoViewColor) === null || _theme$palette$geoVie3 === void 0 ? void 0 : _theme$palette$geoVie3.textColor.main,
-        '&:hover': {
-          backgroundColor: (_theme$palette$geoVie4 = theme.palette.geoViewColor) === null || _theme$palette$geoVie4 === void 0 ? void 0 : _theme$palette$geoVie4.bgColor.dark[50],
-          color: (_theme$palette$geoVie5 = theme.palette.geoViewColor) === null || _theme$palette$geoVie5 === void 0 ? void 0 : _theme$palette$geoVie5.textColor.main
-        }
+        textTransform: 'capitalize'
       }
     },
     dataset: {
@@ -46171,14 +46166,14 @@ var getSxClasses = function getSxClasses(theme) {
     xAxisLabel: {
       fontFamily: theme.typography.body1.fontFamily,
       fontWeight: theme.typography.fontWeightBold,
-      fontSize: (_theme$palette$geoVie6 = theme.palette.geoViewFontSize) === null || _theme$palette$geoVie6 === void 0 ? void 0 : _theme$palette$geoVie6["default"],
+      fontSize: (_theme$palette$geoVie2 = theme.palette.geoViewFontSize) === null || _theme$palette$geoVie2 === void 0 ? void 0 : _theme$palette$geoVie2["default"],
       textAlign: 'center',
       margin: '10px 0px'
     },
     yAxisLabel: {
       fontFamily: theme.typography.body1.fontFamily,
       fontWeight: theme.typography.fontWeightBold,
-      fontSize: (_theme$palette$geoVie7 = theme.palette.geoViewFontSize) === null || _theme$palette$geoVie7 === void 0 ? void 0 : _theme$palette$geoVie7["default"],
+      fontSize: (_theme$palette$geoVie3 = theme.palette.geoViewFontSize) === null || _theme$palette$geoVie3 === void 0 ? void 0 : _theme$palette$geoVie3["default"],
       position: 'absolute',
       top: '45%',
       margin: '0 auto',
@@ -46200,7 +46195,7 @@ var getSxClasses = function getSxClasses(theme) {
     checkDatasetWrapper: {
       display: 'inline-block',
       '& .Mui-checked': {
-        color: "".concat((_theme$palette$geoVie8 = theme.palette.geoViewColor) === null || _theme$palette$geoVie8 === void 0 ? void 0 : _theme$palette$geoVie8.primary.main, " !important")
+        color: "".concat((_theme$palette$geoVie4 = theme.palette.geoViewColor) === null || _theme$palette$geoVie4 === void 0 ? void 0 : _theme$palette$geoVie4.primary.main, " !important")
       }
     },
     checkDatasetLabel: {
@@ -46213,16 +46208,15 @@ var getSxClasses = function getSxClasses(theme) {
     },
     xSliderWrapper: {
       '& .MuiSlider-root': {
-        color: (_theme$palette$geoVie9 = theme.palette.geoViewColor) === null || _theme$palette$geoVie9 === void 0 ? void 0 : _theme$palette$geoVie9.primary.main
+        color: (_theme$palette$geoVie5 = theme.palette.geoViewColor) === null || _theme$palette$geoVie5 === void 0 ? void 0 : _theme$palette$geoVie5.primary.main
       }
     },
     ySliderWrapper: {
       height: '70%',
       textAlign: 'center',
-      marginTop: '-20px',
       marginLeft: '20px',
       '& .MuiSlider-root': {
-        color: (_theme$palette$geoVie10 = theme.palette.geoViewColor) === null || _theme$palette$geoVie10 === void 0 ? void 0 : _theme$palette$geoVie10.primary.main
+        color: (_theme$palette$geoVie6 = theme.palette.geoViewColor) === null || _theme$palette$geoVie6 === void 0 ? void 0 : _theme$palette$geoVie6.primary.main
       }
     },
     loadingDatasource: {
