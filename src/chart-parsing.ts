@@ -108,7 +108,6 @@ export class ChartParsing {
         optionsLine.scales.x.grid = {
           ...optionsLine.scales.x.grid,
           ...chartConfig.geochart.xAxis.grid,
-          display: chartConfig.geochart.xAxis.grid?.display ?? true, // default to true
         };
       }
 
@@ -118,7 +117,6 @@ export class ChartParsing {
         optionsLine.scales.y.grid = {
           ...optionsLine.scales.y.grid,
           ...chartConfig.geochart.yAxis.grid,
-          display: chartConfig.geochart.xAxis.grid?.display ?? true, // default to true
         };
       }
     }

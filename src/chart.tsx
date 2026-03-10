@@ -1031,7 +1031,7 @@ export function GeoChart<
       // Log
       logger.logTraceUseCallback('GEOCHART - handleSliderXChange', newValue);
 
-      // Set the X State
+      // Set the X State for the slider UI itself
       setXSliderValues(newValue);
     },
     [logger]
@@ -1064,7 +1064,7 @@ export function GeoChart<
       // Log
       logger.logTraceUseCallback('GEOCHART - handleSliderYChange', newValue);
 
-      // Set the Y State
+      // Set the Y State for the slider UI itself
       setYSliderValues(newValue);
     },
     [logger]
@@ -1079,7 +1079,7 @@ export function GeoChart<
       // Log
       logger.logTraceUseCallback('GEOCHART - handleSliderYChangeCommitted', newValue);
 
-      // Set the Y State
+      // Set the Y values active
       setYSliderValuesActive(newValue);
 
       // Callback
